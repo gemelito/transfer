@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Image, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Colors from '../constants/colors';
 
 
 export default class TouchableMenuIcon extends React.Component {
@@ -12,10 +14,7 @@ export default class TouchableMenuIcon extends React.Component {
     return (
       <View style={{flexDirection: 'row'}}>
         <TouchableOpacity onPress={this.toggleDrawer.bind(this)} >
-          <Image
-            source={{uri : 'https://reactnativecode.com/wp-content/uploads/2018/04/hamburger_icon.png'}}
-            style={{ width: 25, height: 25, marginLeft: 5}}
-          />
+          <Ionicons name="md-menu" size={32} color={Colors.green} style={{marginLeft: 10}}/>
         </TouchableOpacity>
       </View>
     );

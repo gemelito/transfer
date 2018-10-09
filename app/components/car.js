@@ -5,8 +5,7 @@ import {
   Platform,
   KeyboardAvoidingView,
   TextInput,
-  AsyncStorage,
-  ActivityIndicator
+  AsyncStorage
 } from 'react-native';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,8 +21,7 @@ export default class Search extends React.Component {
     this.state = {
       search: '',
       session: '',
-      errorLabel: false,
-      is_loading: false
+      errorLabel: false
     }
   }
 
@@ -52,17 +50,15 @@ export default class Search extends React.Component {
   }
 
   handleSubmit = () => {
-    this.setState({ 
-      errorLabel: false,
-      is_loading: true
-    });
+    console.log(this.state);
+    this.setState({ errorLabel: false })
     // Call to animation
     // this.handlerLoading();
 
     // Do request to api send params at form
     axios.post(API.url, {
       SessionId: this.state.session,
-      Id: this.state.search.toLocaleUpperCase(),
+      Id: this.state.search,
       Action: "GetCar"
     })
     .then((response) => {
@@ -71,9 +67,6 @@ export default class Search extends React.Component {
         this._storeData(response.data.result);
       } else {
         alert(response.data.result.ErrorDescription);
-        this.setState({
-          is_loading: false
-        });
       }
     })
     .catch((error) => {
@@ -88,31 +81,19 @@ export default class Search extends React.Component {
   _storeData = async (data) => {
     try {
       await AsyncStorage.setItem('car', JSON.stringify(data));
-      this.props.navigation.navigate('Car');
+      this.props.navigation.push('Search');
     } catch (error) {
-      alert(error);
+      console.log(error);
     }
   }
+
 
 
   render() {
     return (
       <KeyboardAvoidingView style={styles.main_login}  behavior="padding" >
           
-          <View style={[styles.input_icon, this.state.errorLabel ? styles.invalid : styles.valid]}>
-            <TextInput
-              style={[styles.inputStyle]}
-                autoCorrect={false}
-                autoCapitalize="words"
-                placeholder="Contraseña"
-                underlineColorAndroid="transparent"
-                onChangeText={ (search)  =>  this.setState({search}) }
-              />
-            <Ionicons name="md-search" size={32} onPress={this.handleValidate.bind(this)} style={styles.icon}/>
-          </View>
-          { this.state.is_loading &&
-            <ActivityIndicator size="large" color={Colors.green} />
-          }
+
 
       </KeyboardAvoidingView>
     );
@@ -127,6 +108,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   
   
   // Esto debe ser global
