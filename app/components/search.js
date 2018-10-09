@@ -69,6 +69,9 @@ export default class Search extends React.Component {
       // Get response, if response (Success) was true change to screen
       if (response.data.result.Success && response.data.result.Success === true) {
         this._storeData(response.data.result);
+        this.setState({
+          is_loading: false
+        });
       } else {
         alert(response.data.result.ErrorDescription);
         this.setState({
@@ -86,9 +89,15 @@ export default class Search extends React.Component {
   }
 
   _storeData = async (data) => {
+    let type_transfer = 'CAMBIO';
     try {
       await AsyncStorage.setItem('car', JSON.stringify(data));
-      this.props.navigation.navigate('Car');
+      if (data.Car.Transfer.ActionType === 'S'){
+        type_transfer = 'TRASLADO';
+      }
+      this.props.navigation.navigate('Car', {
+        type_transfer: type_transfer,
+      });
     } catch (error) {
       alert(error);
     }
