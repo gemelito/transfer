@@ -109,7 +109,7 @@ export default class Car extends React.Component {
         </View>
         {/* Container information */}
 
-        <View style={[styles.absolute, styles.pb, styles.ml_10, styles.mr_10, styles.bottom_0]}>
+        <View style={[styles.absolute, styles.pb_20, styles.ml_10, styles.mr_10, styles.bottom_0]}>
 
           <View style={{flexDirection: 'row'}}>
           
@@ -145,7 +145,7 @@ export default class Car extends React.Component {
 const styles = StyleSheet.create({
 
   btn: {
-    width: 175,
+    width: 165,
     borderWidth: 1,
     borderRadius: 5,
   },
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   pb_10: {
     paddingBottom: 10
   },
-  pb: {
+  pb_20: {
     paddingBottom: 20
   },
 

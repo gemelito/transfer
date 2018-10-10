@@ -47,6 +47,12 @@ export default class Search extends React.Component {
    }
  }
 
+ handleChangeText = (text) => {
+  this.setState({
+    search: text.toLocaleUpperCase()
+  });
+ }
+
   handleValidate = () => {
     ( this.state.search === '' ) ? this.setState({ errorLabel: true }) : this.handleSubmit();
   }
@@ -62,7 +68,7 @@ export default class Search extends React.Component {
     // Do request to api send params at form
     axios.post(API.url, {
       SessionId: this.state.session,
-      Id: this.state.search.toLocaleUpperCase(),
+      Id: this.state.search,
       Action: "GetCar"
     })
     .then((response) => {
@@ -75,7 +81,8 @@ export default class Search extends React.Component {
       } else {
         alert(response.data.result.ErrorDescription);
         this.setState({
-          is_loading: false
+          is_loading: false,
+          search: ''
         });
       }
     })
@@ -113,9 +120,10 @@ export default class Search extends React.Component {
               style={[styles.inputStyle]}
                 autoCorrect={false}
                 autoCapitalize="words"
-                placeholder="Contraseña"
+                placeholder="Ingresa número económico"
                 underlineColorAndroid="transparent"
-                onChangeText={ (search)  =>  this.setState({search}) }
+                onChangeText={ this.handleChangeText }
+                value={this.state.search}
               />
             <Ionicons name="md-search" size={32} onPress={this.handleValidate.bind(this)} style={styles.icon}/>
           </View>
