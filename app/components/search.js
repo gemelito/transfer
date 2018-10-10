@@ -23,7 +23,8 @@ export default class Search extends React.Component {
       search: '',
       session: '',
       errorLabel: false,
-      is_loading: false
+      is_loading: false,
+      isFocused: false
     }
   }
 
@@ -49,9 +50,17 @@ export default class Search extends React.Component {
 
  handleChangeText = (text) => {
   this.setState({
-    search: text.toLocaleUpperCase()
+    search: text.toLocaleUpperCase(),
+    errorLabel: false,
+    isFocused: true
   });
  }
+
+  onFocusChange = () => {
+    this.setState({
+      isFocused: true
+    });
+  }
 
   handleValidate = () => {
     ( this.state.search === '' ) ? this.setState({ errorLabel: true }) : this.handleSubmit();
@@ -60,10 +69,9 @@ export default class Search extends React.Component {
   handleSubmit = () => {
     this.setState({ 
       errorLabel: false,
-      is_loading: true
+      is_loading: true,
+      isFocused: false
     });
-    // Call to animation
-    // this.handlerLoading();
 
     // Do request to api send params at form
     axios.post(API.url, {
@@ -82,7 +90,8 @@ export default class Search extends React.Component {
         alert(response.data.result.ErrorDescription);
         this.setState({
           is_loading: false,
-          search: ''
+          search: '',
+          isFocused: true
         });
       }
     })
@@ -113,19 +122,30 @@ export default class Search extends React.Component {
 
   render() {
     return (
-      <KeyboardAvoidingView style={styles.main_login}  behavior="padding" >
+      <KeyboardAvoidingView style={styles.main_login}  behavior="padding" enabled>
           
-          <View style={[styles.input_icon, this.state.errorLabel ? styles.invalid : styles.valid]}>
+          <View 
+            style={[
+              styles.row, styles.border, styles.ml_10, styles.mr_10, styles.pl_10,
+              this.state.errorLabel ? styles.border_invalid : (this.state.isFocused) ? styles.border_valid : styles.border_black_dark
+            ]}
+          >
             <TextInput
-              style={[styles.inputStyle]}
-                autoCorrect={false}
-                autoCapitalize="words"
-                placeholder="Ingresa número económico"
-                underlineColorAndroid="transparent"
-                onChangeText={ this.handleChangeText }
-                value={this.state.search}
-              />
-            <Ionicons name="md-search" size={32} onPress={this.handleValidate.bind(this)} style={styles.icon}/>
+              style={[
+                styles.flex_1, styles.pt_10, styles.pb_10, {fontSize:18}
+              ]}
+              onFocus={this.onFocusChange}
+              placeholder="Ingresa número económico"
+              underlineColorAndroid="transparent"
+              onChangeText={ this.handleChangeText }
+              value={this.state.search}
+            />
+            <Ionicons name="md-search" size={32} onPress={this.handleValidate.bind(this)} 
+              style={[
+                styles.pt_10, styles.pr_10,
+                this.state.errorLabel ? styles.text_red : (this.state.isFocused) ? styles.text_green : styles.text_black_dark
+              ]}
+            />
           </View>
           { this.state.is_loading &&
             <ActivityIndicator size="large" color={Colors.green} />
@@ -144,39 +164,66 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
-  
-  // Esto debe ser global
 
-  input_icon: {
-    flexDirection: 'row',
-    width: 300,
-    height: 50,
-    borderRadius: 5,
-    paddingLeft: 10,
-    marginBottom: 10,
+  border: {
     borderWidth: 1,
+    borderRadius: 5,
   },
-  inputStyle: {
+
+  flex_1: {
     flex: 1,
   },
-  icon: {
-    paddingTop: 10,
-    paddingRight: 10,
+
+  row: {
+    flexDirection: 'row'
   },
 
-  valid: Platform.select({
-    ios: {},
-    android: {
-      borderColor: Colors.black_dark
-    }
-  }),
+  pl_10: {
+    paddingLeft: 10
+  },
+  pt_10: {
+    paddingTop: 10,
+  },
+  pr_10: {
+  paddingRight: 10
+  },
+  pb_10: {
+    paddingBottom: 10,
+  },
 
-  invalid: Platform.select({
-    ios: {},
-    android: {
-      borderColor: Colors.red,
-    }
-  }),
+  ml_10: {
+    marginLeft: 10
+  },
+  mt_10: {
+    marginBottom: 10
+  },
+  mr_10: {
+    marginRight: 10
+  },
+
+  /** Style valid input **/
+  border_black_dark: {
+    borderColor: Colors.black_dark
+  },
+  border_valid: {
+    borderColor: Colors.green
+  },
+  border_invalid: {
+    borderColor: Colors.red,
+  },
+  text_green: {
+    color: Colors.green
+  },
+  text_red: {
+    color: Colors.red
+  },
+  text_black:{
+    color: Colors.black_dark
+  },
+  text_black_dark: {
+    color: Colors.black_dark
+  }
+  
+
   
 });
