@@ -1,24 +1,22 @@
 import React from 'react';
 import {
   StyleSheet,
-  Text,
   View,
-  TextInput,
-  Platform,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
   KeyboardAvoidingView,
   AsyncStorage,
-  Animated,
-  Image,
-  ToastAndroid
+  TouchableOpacity,
+  Text,
 } from 'react-native';
-import HeaderLogin from './header-login';
-import Colors from '../constants/colors';
 import axios from 'axios';
-import API from '../constants/base_url';
 
-import { Ionicons } from '@expo/vector-icons';
+import HeaderLogin from './header-login';
+import Buttons from './buttons/button';
+
+import API from '../constants/base_url';
+import InputField from './form/input';
+
+import common from '../constants/common';
+
 
 export default class Login extends React.Component {
 
@@ -34,13 +32,12 @@ export default class Login extends React.Component {
       Password: '',
       errorUsername: false,
       errorPassword: false,
-      is_loading: false
+      is_loading: false,
     }
 
-    this.colorValue = new Animated.Value(0);
-    
+    this.handleValidate = this.handleValidate.bind(this);
   }
-  
+
   componentDidMount(){
     this._loadInitialState().done();
   }
@@ -52,12 +49,6 @@ export default class Login extends React.Component {
       const session = await AsyncStorage.getItem('user');
       // If existe change to creen
       if ( session !== null ){
-        // if (typeof session === 'string'){
-        //   alert("Es un texto");
-        // }else{
-        //   alert("No es un texto");
-        // }
-        // console.log(session);
         this.props.navigation.navigate('Search');
       }
     } catch (error){
@@ -66,22 +57,17 @@ export default class Login extends React.Component {
   }
 
   // This validate the inputs not is empty
-  handleValidate = () => {
+  handleValidate() {
+    const { Username, Password } = this.state;
+    console.log(this.state);
+    // ( Username === '' ) ? this.setState({ errorUsername: true }) : this.setState({ errorUsername: false }) ;
+    
+    // ( Password === '' ) ? this.setState({ errorPassword: true }) : this.setState({ errorPassword: false }) ;
+    
 
-    if ( this.state.Username === '' ){
-      this.setState({ errorUsername: true });
-    }else{
-      this.setState({ errorUsername: false });
-    }
-    if ( this.state.Password === '' ){
-      this.setState({ errorPassword: true });
-    }else{
-      this.setState({ errorPassword: false });
-    }
-
-    // This call method handleSubmit
-    if ( this.state.Username !== '' && this.state.Password !== '')
-      this.handleSubmit();
+    // // This call method handleSubmit
+    // if ( Username !== '' && Password !== '')
+    //   this.handleSubmit();
 
   }
 
@@ -120,174 +106,62 @@ export default class Login extends React.Component {
   _storeData = async (data) => {
     try {
       await AsyncStorage.setItem('user', JSON.stringify(data));
-      this.props.navigation.push('Search');
+      this.props.navigation.navigate('Search');
     } catch (error) {
-      console.log(error);
+      alert(error);
     }
   }
-
-	handlerLoading = () => {
-	  this.setState({
-	    is_loading: true
-	  });
-
-	  this.colorValue.setValue(0);
-	  Animated.timing(this.colorValue, {
-	    toValue: 100,
-	    duration: 15000
-	  }).start(() => {
-	    this.setState({
-	      is_loading: false
-	    });
-	  });
-  }
   
-
+  handleChangeText = (text) => {
+    console.log(text);
+  }
   render() {
-    const colorAnimation = this.colorValue.interpolate({
-      inputRange: [0, 50, 100],
-      outputRange: [Colors.black, Colors.black_dark, Colors.other_black]
-    });
     return (
-      <KeyboardAvoidingView style={styles.main_login}  behavior="padding" >
+      <KeyboardAvoidingView style={[common.flex_1, common.bg_white]}  behavior="padding">
         <HeaderLogin/>
-        <View style={styles.container}>
-          <TextInput
-            style={[styles.input, this.state.errorUsername ? styles.invalid : styles.valid ]}
-            placeholder="Username"
-            underlineColorAndroid="transparent"
-            onChangeText={ (Username)  =>  this.setState({Username}) }
+          
+        <View style={[common.ml_10, common.mr_10, common.center, {flex:5}]}>
+          <InputField
+            placeholder="Usuario"
+            inValid={this.state.errorUsername}
+            onChangeText={this.handleChangeText.bind(this)}
+            value={this.state.Username}
           />
-
-          {/* <TextInput
-            secureTextEntry={true}
-            style={[styles.input, this.state.errorPassword ? styles.invalid : styles.valid ]}
+          <InputField
+            have_top={true}
+            input_icon={true}
             placeholder="Contraseña"
-            underlineColorAndroid="transparent"
+            password={true}
+            inValid={this.state.errorPassword}
             onChangeText={ (Password)  =>  this.setState({Password}) }
           />
-          <Ionicons name="md-eye-off" size={32} color="green" styles={styles.my_icon} /> */}
 
-          <View style={[styles.input_icon, this.state.errorPassword ? styles.invalid : styles.valid]}>
-            <TextInput
-              style={[styles.inputStyle]}
-                autoCorrect={false}
-                secureTextEntry
-                placeholder="Contraseña"
-                underlineColorAndroid="transparent"
-                onChangeText={ (Password)  =>  this.setState({Password}) }
-              />
-            <Ionicons name="md-eye-off" size={32} style={styles.icon}/>
-          </View>
+          <View style={[ {borderWidth: 4,width:35,  borderRadius:5, marginTop:20, marginBottom: 10}, common.border_other_black,]} />
 
-          <TouchableWithoutFeedback onPress={this.handleValidate.bind(this)}>
-            <Animated.View 
-              style={[
-                styles.btn,
-                this.props.styles ? this.props.styles.button : '',
-              {
-                backgroundColor: colorAnimation
-              },
-              ]}
-            >
-              { 
-                this.state.is_loading && 
-                <Image
-                  style={styles.loader}
-                  source={require('../../assets/load.gif')}
-                />
-              }
-              <Text style={styles.text_login}>
-                { this.state.is_loading ? 'loading...' : 'Iniciar sesion'}
+          <TouchableOpacity
+            style={[
+              common.border,
+              common.w_100,
+              common.bg_yellow,
+              common.border_yellow,
+              common.pt_10,
+              common.pb_10,
+              common.text_center,
+              common.mt_10
+            ]}
+            activeOpacity={0.7}
+            onPress={this.handleValidate}
+          >
+              <Text style={[common.text_black, common.fs_16, common.bold]}>
+                {/* { this.state.is_loading ? 'loading...' : 'Iniciar sesion'} */}
+                INGRESAR
               </Text>
-            </Animated.View>
-          </TouchableWithoutFeedback>
+          </TouchableOpacity>
 
         </View>
       </KeyboardAvoidingView>
     );
   }
+
 }
 
-const styles = StyleSheet.create({
-  main_login: {
-    flex:1
-  },
-  
-  container: {
-    flex: 2,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  input: Platform.select({
-    ios: {},
-    android:{
-    flexDirection: 'row',
-      width: 300,
-      height: 50,
-      borderRadius: 5,
-      paddingLeft: 10,
-      paddingRight: 10,
-      marginBottom: 10,
-      borderWidth: 1
-    }
-  }),
-
-  valid: Platform.select({
-    ios: {},
-    android: {
-      borderColor: Colors.black_dark
-    }
-  }),
-
-  invalid: Platform.select({
-    ios: {},
-    android: {
-      borderColor: Colors.red,
-    }
-  }),
-
-  btn: {
-    borderRadius: 5,
-    backgroundColor: Colors.black,
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 30,
-    paddingRight: 30,
-    flexDirection: 'row',
-		alignItems: 'center',
-
-  },
-
-  text_login: {
-    color: Colors.white,
-    fontSize: 18
-  },
-
-  loader: {
-    width: 23,
-    height: 23,
-    marginRight: 10
-  },
-
-
-  input_icon: {
-    flexDirection: 'row',
-    width:300,
-    height: 50,
-    borderRadius: 5,
-    paddingLeft: 10,
-    paddingRight: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-  },
-  inputStyle: {
-    flex: 1,
-  },
-  icon: {
-    paddingTop: 10
-  }
-  
-});

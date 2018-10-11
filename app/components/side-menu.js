@@ -5,13 +5,29 @@ import {
   Text,
   TouchableOpacity,
   Image,
-  StyleSheet
+  StyleSheet,
+  AsyncStorage,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import Colors from '../constants/colors';
 
 export default class SideMenu extends React.Component {
+
+  _removeUser = async () => {
+    try {
+      await AsyncStorage.removeItem('user');
+      const session = await AsyncStorage.getItem('user');
+      if (session === null) {
+        this.props.navigation.navigate('Login');
+        this.props.navigation.closeDrawer();
+      }
+
+    } catch (error) {
+      alert("Ocurrio algo en el async")
+    }
+  }
+
   render() {
     return (
       <View style={{flex: 1, backgroundColor: 'green'}}>
@@ -46,12 +62,7 @@ export default class SideMenu extends React.Component {
 
         <TouchableOpacity 
           style={styles.btn_liks}
-          onPress = {
-            () => {
-              this.props.navigation.navigate('Login');
-              this.props.navigation.closeDrawer();
-            }
-          }
+          onPress = {this._removeUser}
         >
           <View style={styles.space_text_icon}>
             <Ionicons name="md-log-out" size={25} color={Colors.white}/>
