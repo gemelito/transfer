@@ -4,89 +4,45 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 
-import Colors from '../../constants/colors';
+
+import common from '../../constants/common';
 
 export default class Buttons extends Component {
 	render() {
+    const { isLoading, bg, borderColor, twoButttons, textLabel, btnBorder } = this.props;
 		return (
 			<TouchableOpacity
 				style={[
-					styles.border,
-					styles.w_100,
-					styles.bg_yellow,
-					styles.border_yellow,
-					styles.pt_10,
-					styles.pb_10,
-					styles.text_center,
-					styles.mt_10
+          common.border,
+					common.pt_10,
+          common.pb_10,
+          common.pl_10,
+          common.pr_10,
+					common.text_center,
+          common.mt_10,
+          
+          // twoButttons ? common.w_45_btn : '',
+          isLoading   ? ''          : common.w_100,
+          bg          ? bg          : common.bg_other_black,
+          borderColor ? borderColor : common.border_other_black,
 				]}
 				activeOpacity={0.7}
-				onPress={handleValidate}
+				{...this.props}
 			>
-					<Text style={[styles.text_black, styles.fs_16, styles.bold]}>
-						{/* { this.state.is_loading ? 'loading...' : 'Iniciar sesion'} */}
-						INGRESAR
-					</Text>
+        {isLoading ?
+          <View>
+            <ActivityIndicator size={30} color="#484848" />
+          </View>
+          :
+          <Text style={[common.text_black, common.fs_16, common.bold]}>
+            {textLabel}
+          </Text>
+        }
 			</TouchableOpacity>
 		);
 	}
 }
-
-const styles = StyleSheet.create({
-	bold:{
-		fontWeight: 'bold'
-	},
-	bg_yellow:{
-		backgroundColor: Colors.yellow
-	},
-  border: {
-    borderWidth: 1,
-    borderRadius: 5,
-	},
-	border_yellow: {
-		borderColor: Colors.yellow
-	},
-	
-  pl_10: {
-    paddingLeft: 10
-  },
-  pt_10: {
-    paddingTop: 10,
-  },
-  pr_10: {
-    paddingRight: 10
-  },
-  pb_10: {
-    paddingBottom: 10,
-  },
-
-  ml_10: {
-    marginLeft: 10
-  },
-  mt_10: {
-    marginTop: 10
-  },
-  mr_10: {
-    marginRight: 10
-  },
-
-	text_center:{
-		alignItems: 'center'
-	},
-  text_black: {
-    color: Colors.black
-  },
-
-  /** Size **/
-  fs_16: {
-    fontSize: 16
-  },
-
-  w_100: {
-    width: '100%'
-  },
-
-});

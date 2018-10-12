@@ -11,7 +11,7 @@ import Colors from '../constants/colors';
 
 
 
-export default class Search extends React.Component {
+export default class Change extends React.Component {
 
   constructor(props){
     super(props);

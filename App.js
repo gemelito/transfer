@@ -6,6 +6,7 @@ import { createStackNavigator, createDrawerNavigator } from 'react-navigation';
 import Login from './app/components/login';
 import Search from './app/components/search';
 import Car from './app/components/car';
+import Change from './app/components/change';
 
 // This header sign in user and side navbar menu
 import TouchableMenuIcon from './app/components/header';
@@ -17,7 +18,8 @@ const Application = createStackNavigator(
     // This screens components
     Login: Login,
     Search: Search,
-    Car: Car
+    Car: Car,
+    Change: Change
   },
   {
     // Initial Screen component

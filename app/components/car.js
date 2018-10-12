@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  StyleSheet,
+  commonheet,
   View,
   Platform,
   AsyncStorage,
@@ -10,7 +10,11 @@ import {
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
+import Buttons from './buttons/button';
+
 import Colors from '../constants/colors';
+import common from '../constants/common';
+
 import API from '../constants/base_url';
 
 
@@ -80,59 +84,64 @@ export default class Car extends React.Component {
 
   render() {
     return (
-      <View style={[styles.flex_1, styles.bg_white]}>
-        <View style={[styles.text_center, styles.pt_10, styles.pb_10]}>
-          <Text style={[styles.h1, styles.text_other_black,]}>Verifique la información del auto</Text>
+      <View style={[common.flex_1, common.bg_white]}>
+        <View style={[common.text_center, common.pt_10, common.pb_10, common.mt_10]}>
+          <Text style={[common.h1, common.text_other_black,]}>Verifique la información del auto</Text>
         </View>
-
-        <View style={[styles.bg_light, styles.ml_10, styles.mt_10, styles.mr_10, styles.pb_10]}>
-          <Text style={[styles.h2, styles.text_black_dar, styles.pl_10, styles.pt_10, styles.pb_10, styles.bold]}>DATOS DEL AUTO</Text>
+        <View style={[common.bg_light, common.ml_10, common.mt_10, common.mr_10, common.pb_10]}>
+          <Text style={[common.h2, common.text_black_dark, common.pl_10, common.pt_10, common.pb_10, common.bold]}>DATOS DEL AUTO</Text>
 
           <View style={{flexDirection: 'row'}}>
           
             <View style={{width: 160, paddingLeft:10}}>
-              <Text style={[styles.h3, styles.text_other_black]}>No. Económico:</Text>
-              <Text style={[styles.h3, styles.pt_5, styles.text_other_black]}>Modelo:</Text>
-              <Text style={[styles.h3, styles.pt_5, styles.text_other_black]}>Version:</Text>
-              <Text style={[styles.h3, styles.pt_5, styles.text_other_black]}>Placas:</Text>
-              <Text style={[styles.h3, styles.pt_5, styles.text_other_black]}>Color:</Text>
+              <Text style={[common.h3, common.text_other_black]}>No. Económico:</Text>
+              <Text style={[common.h3, common.pt_10, common.text_other_black]}>Modelo:</Text>
+              <Text style={[common.h3, common.pt_10, common.text_other_black]}>Version:</Text>
+              <Text style={[common.h3, common.pt_10, common.text_other_black]}>Placas:</Text>
+              <Text style={[common.h3, common.pt_10, common.text_other_black]}>Color:</Text>
             </View>
             <View style={{width: 200, paddingRight:10}}>
-              <Text style={[styles.h3, styles.text_other_black]}>{this.state.num_economic}</Text>
-              <Text style={[styles.h3, styles.pt_5, styles.text_other_black]}>{this.state.model}</Text>
-              <Text style={[styles.h3, styles.pt_5, styles.text_other_black]}>{this.state.version}</Text>
-              <Text style={[styles.h3, styles.pt_5, styles.text_other_black]}>{this.state.plate}</Text>
-              <Text style={[styles.h3, styles.pt_5, styles.text_other_black]}>{this.state.color}</Text>
+              <Text style={[common.h3, common.text_other_black]}>{this.state.num_economic}</Text>
+              <Text style={[common.h3, common.pt_10, common.text_other_black]}>{this.state.model}</Text>
+              <Text style={[common.h3, common.pt_10, common.text_other_black]}>{this.state.version}</Text>
+              <Text style={[common.h3, common.pt_10, common.text_other_black]}>{this.state.plate}</Text>
+              <Text style={[common.h3, common.pt_10, common.text_other_black]}>{this.state.color}</Text>
             </View>
           </View>
           
         </View>
         {/* Container information */}
 
-        <View style={[styles.absolute, styles.pb_20, styles.ml_10, styles.mr_10, styles.bottom_0]}>
+        <View 
+          style={[
+            common.display_flex,
+            common.row,
+            common.absolute,
+            common.space_between,
+            common.w_100,
+            common.bottom_0,
+            common.pb_20,
+          ]}
+        >
 
-          <View style={{flexDirection: 'row'}}>
-          
-            <View>
-              <TouchableWithoutFeedback onPress={() => this.props.navigation.goBack()}>
-                <View style={[styles.btn, styles.border_green, styles.pt_10, styles.mr_10, styles.pb_10, styles.text_center, ]}>
-                  <Text style={[styles.text_black, styles.bold]}>
-                    REGRESAR
-                  </Text>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
-
-            <View>
-              <TouchableWithoutFeedback>
-                <View style={[styles.btn, styles.border_yellow, styles.bg_yellow, styles.pt_10, styles.mr_10, styles.pb_10, styles.text_center, ]}>
-                  <Text style={[styles.text_black, styles.bold]}>
-                    SIGUIENTE
-                  </Text>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
+          <View style={[common.w_45_btn, common.ml_10]}>
+            <Buttons
+              borderColor={common.border_green}
+              bg={common.bg_transparent}
+              textLabel="REGRESAR"
+              onPress={() => this.props.navigation.goBack() }
+            />
           </View>
+
+          <View style={[common.w_45_btn, common.mr_10]}>
+            <Buttons
+              borderColor={common.bg_yellow}
+              bg={common.border_yellow}
+              textLabel="SIGUIENTE"
+              onPress={() => this.props.navigation.navigate('Change') }
+            />
+          </View>
+
         </View>
         {/* Botones */}
 
@@ -142,96 +151,3 @@ export default class Car extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
-
-  btn: {
-    width: 165,
-    borderWidth: 1,
-    borderRadius: 5,
-  },
-
-  bold: {
-    fontWeight: 'bold'
-  },
-  border_green: {
-    borderColor: Colors.green,
-  },
-  border_yellow: {
-    borderColor: Colors.yellow,
-  },
-  bg_white: {
-    backgroundColor: Colors.white
-  },
-  bg_light:{
-    backgroundColor: Colors.black_light
-  },
-  bg_yellow: {
-    backgroundColor: Colors.yellow
-  },
-  bottom_0: {
-    bottom: 0
-  },
-
-  flex_1:{
-    flex: 1
-  },
-
-  h1:{
-    fontSize: 24
-  },
-  h2:{
-    fontSize: 20
-  },
-  h3: {
-    fontSize: 18
-  },
-
-
-  
-  mt_10:{
-    marginTop: 10
-  },
-  mb_10:{
-    marginBottom: 10
-  },
-  ml_10: {
-    marginLeft: 10
-  },
-  mr_10: {
-    marginRight: 10
-  },
-
-
-  pl_10: {
-    paddingLeft: 10
-  },
-  pt_10: {
-    paddingTop: 10
-  },
-  pt_5: {
-    paddingTop: 5
-  },
-  pb_10: {
-    paddingBottom: 10
-  },
-  pb_20: {
-    paddingBottom: 20
-  },
-
-  absolute: {
-    position: 'absolute'
-  },
-
-  text_center: {
-    alignItems: 'center',
-  },
-  text_black: {
-    color: Colors.black
-  },
-  text_other_black: {
-    color: Colors.other_black
-  },
-  text_black_dar:{
-    color: Colors.black_dark
-  }
-});

@@ -6,8 +6,23 @@ import Colors from './colors';
 
 
 const common = StyleSheet.create({
+  absolute: {
+    position: 'absolute'
+  },
 	bold: {
     fontWeight: 'bold'
+  },
+  bottom_0:{
+    bottom:0
+  },
+  bg_transparent: {
+    backgroundColor: 'transparent'
+  },
+  bg_green: {
+    backgroundColor: Colors.green
+  },
+  bg_light: {
+    backgroundColor: Colors.black_light
   },
   bg_yellow: {
     backgroundColor: Colors.yellow
@@ -21,6 +36,9 @@ const common = StyleSheet.create({
   border: {
     borderWidth: 1,
     borderRadius: 5,
+  },
+  border_green:{
+    borderColor: Colors.green
   },
   border_yellow: {
     borderColor: Colors.yellow
@@ -49,6 +67,27 @@ const common = StyleSheet.create({
   flex_1: {
     flex: 1
   },
+  display_flex: {
+    display: 'flex'
+  },
+  row: {
+    flexDirection: 'row',
+  },
+  column: {
+    flexDirection: 'column',
+  },
+  space_between: {
+    justifyContent: 'space-between'
+  },
+  h1: {
+    fontSize: 24
+  },
+  h2: {
+    fontSize: 20
+  },
+  h3: {
+    fontSize: 18
+  },
 
   pl_10: {
     paddingLeft: 10
@@ -61,6 +100,9 @@ const common = StyleSheet.create({
   },
   pb_10: {
     paddingBottom: 10,
+  },
+  pb_20: {
+    paddingBottom: 20
   },
 
   /** Margins **/
@@ -94,12 +136,18 @@ const common = StyleSheet.create({
   text_black_dark: {
     color: Colors.black_dark
   },
+  text_other_black: {
+    color: Colors.other_black
+  },
 
   /** Size **/
   fs_16: {
     fontSize: 16
   },
 
+  w_45_btn: {
+    width: '45%'
+  },
   w_100: {
     width: '100%'
   },

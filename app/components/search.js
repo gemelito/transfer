@@ -12,6 +12,7 @@ import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
 import Colors from '../constants/colors';
+import common from '../constants/common';
 import API from '../constants/base_url';
 
 
@@ -23,14 +24,14 @@ export default class Search extends React.Component {
       search: '',
       session: '',
       errorLabel: false,
-      is_loading: false,
+      isLoading: false,
       isFocused: false
     }
   }
 
- componentDidMount(){
- this._loadInitialState().done();
- }
+  componentDidMount(){
+    this._loadInitialState().done();
+  }
 
  // This method is load then finished, this componente
  _loadInitialState = async () => {
@@ -41,7 +42,6 @@ export default class Search extends React.Component {
      if (session !== null) {
       let json_user = JSON.parse(session);
       this.state.session = json_user["Session"]["SessionId"];
-      // console.log(json_user["Session"]["SessionId"]);
      }
    } catch (error) {
      alert(error);
@@ -50,17 +50,13 @@ export default class Search extends React.Component {
 
  handleChangeText = (text) => {
   this.setState({
-    search: text.toLocaleUpperCase(),
+    search: text.toUpperCase(),
     errorLabel: false,
     isFocused: true
   });
  }
 
-  onFocusChange = () => {
-    this.setState({
-      isFocused: true
-    });
-  }
+  onFocusChange = () => { this.setState({ isFocused: true }); }
 
   handleValidate = () => {
     ( this.state.search === '' ) ? this.setState({ errorLabel: true }) : this.handleSubmit();
@@ -69,7 +65,7 @@ export default class Search extends React.Component {
   handleSubmit = () => {
     this.setState({ 
       errorLabel: false,
-      is_loading: true,
+      isLoading: true,
       isFocused: false
     });
 
@@ -84,12 +80,12 @@ export default class Search extends React.Component {
       if (response.data.result.Success && response.data.result.Success === true) {
         this._storeData(response.data.result);
         this.setState({
-          is_loading: false
+          isLoading: false
         });
       } else {
         alert(response.data.result.ErrorDescription);
         this.setState({
-          is_loading: false,
+          isLoading: false,
           search: '',
           isFocused: true
         });
@@ -98,7 +94,7 @@ export default class Search extends React.Component {
     .catch((error) => {
       // If exist error finished animation and show error
       this.setState({
-        is_loading: false
+        isLoading: false
       });
       alert(error);
     });
@@ -124,32 +120,44 @@ export default class Search extends React.Component {
     return (
       <KeyboardAvoidingView style={styles.main_login}  behavior="padding" enabled>
           
-          <View 
+        <View 
+          style={[
+            common.row, 
+            common.border, 
+            common.ml_10, 
+            common.mr_10, 
+            common.pl_10,
+
+            this.state.errorLabel ? common.border_invalid : (this.state.isFocused) ? common.border_valid : common.border_black_dark
+          ]}
+        >
+          <TextInput
             style={[
-              styles.row, styles.border, styles.ml_10, styles.mr_10, styles.pl_10,
-              this.state.errorLabel ? styles.border_invalid : (this.state.isFocused) ? styles.border_valid : styles.border_black_dark
+              common.flex_1, 
+              common.pt_10, 
+              common.pb_10, 
+              common.fs_16
             ]}
-          >
-            <TextInput
-              style={[
-                styles.flex_1, styles.pt_10, styles.pb_10, {fontSize:18}
-              ]}
-              onFocus={this.onFocusChange}
-              placeholder="Ingresa número económico"
-              underlineColorAndroid="transparent"
-              onChangeText={ this.handleChangeText }
-              value={this.state.search}
-            />
-            <Ionicons name="md-search" size={32} onPress={this.handleValidate.bind(this)} 
-              style={[
-                styles.pt_10, styles.pr_10,
-                this.state.errorLabel ? styles.text_red : (this.state.isFocused) ? styles.text_green : styles.text_black_dark
-              ]}
-            />
-          </View>
-          { this.state.is_loading &&
-            <ActivityIndicator size="large" color={Colors.green} />
-          }
+
+            onFocus={this.onFocusChange}
+            placeholder="Ingresa número económico"
+            underlineColorAndroid="transparent"
+            onChangeText={ this.handleChangeText }
+            value={this.state.search}
+          />
+
+          <Ionicons name="md-search" size={32} onPress={this.handleValidate.bind(this)} 
+            style={[
+              common.pt_10, common.pr_10,
+              this.state.errorLabel ? common.text_red : (this.state.isFocused) ? common.text_green : common.text_black_dark
+            ]}
+          />
+
+      </View>
+
+        { this.state.isLoading &&
+          <ActivityIndicator size="large" color={Colors.black} />
+        }
 
       </KeyboardAvoidingView>
     );
@@ -157,73 +165,11 @@ export default class Search extends React.Component {
 }
 
 const styles = StyleSheet.create({
-
   main_login: {
     flex: 2,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-  border: {
-    borderWidth: 1,
-    borderRadius: 5,
-  },
-
-  flex_1: {
-    flex: 1,
-  },
-
-  row: {
-    flexDirection: 'row'
-  },
-
-  pl_10: {
-    paddingLeft: 10
-  },
-  pt_10: {
-    paddingTop: 10,
-  },
-  pr_10: {
-  paddingRight: 10
-  },
-  pb_10: {
-    paddingBottom: 10,
-  },
-
-  ml_10: {
-    marginLeft: 10
-  },
-  mt_10: {
-    marginBottom: 10
-  },
-  mr_10: {
-    marginRight: 10
-  },
-
-  /** Style valid input **/
-  border_black_dark: {
-    borderColor: Colors.black_dark
-  },
-  border_valid: {
-    borderColor: Colors.green
-  },
-  border_invalid: {
-    borderColor: Colors.red,
-  },
-  text_green: {
-    color: Colors.green
-  },
-  text_red: {
-    color: Colors.red
-  },
-  text_black:{
-    color: Colors.black_dark
-  },
-  text_black_dark: {
-    color: Colors.black_dark
-  }
-  
-
   
 });
