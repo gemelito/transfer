@@ -3,9 +3,9 @@ import { View, KeyboardAvoidingView, AsyncStorage } from 'react-native';
 import axios from 'axios';
 
 
-import HeaderLogin from './header-login';
-import InputField  from './form/input';
-import Buttons from './buttons/button';
+import HeaderLogin from '../components/helpers/header-login';
+import InputField  from '../components/form/input';
+import Buttons from '../components/buttons/button';
 
 import common from '../constants/common';
 import API from '../constants/base_url';

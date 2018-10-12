@@ -3,14 +3,14 @@ import React, { Component } from 'react';
 import { createStackNavigator, createDrawerNavigator } from 'react-navigation';
 
 // This screens
-import Login from './app/components/login';
-import Search from './app/components/search';
-import Car from './app/components/car';
-import Change from './app/components/change';
+import Login from './app/screens/login';
+import Search from './app/screens/search';
+import Car from './app/screens/car';
+import Change from './app/screens/change';
 
 // This header sign in user and side navbar menu
-import TouchableMenuIcon from './app/components/header';
-import SideMenu from './app/components/side-menu';
+import HeaderBar from './app/components/helpers/header-bar';
+import SideMenu from './app/components/helpers/side-menu';
 
 // This object to create navigation
 const Application = createStackNavigator(
@@ -27,7 +27,7 @@ const Application = createStackNavigator(
     // Options setup navigation
     navigationOptions: ({ navigation }) => ({ 
       // Side navbar menu
-      headerLeft: <TouchableMenuIcon navigationProps={ navigation }/>
+      headerLeft: <HeaderBar navigationProps={ navigation }/>
     })
   }
 );

@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import Colors from '../constants/colors';
+import Colors from '../../constants/colors';
 
 export default class SideMenu extends React.Component {
 
@@ -34,7 +34,7 @@ export default class SideMenu extends React.Component {
       	<TouchableOpacity onPress={() => navigateToCallback('Search')} style={styles.header_drawer}>
           <View style={{width: 70}}>
             <Image
-              source={require('../../assets/avatar.png')}
+              source={require('../../../assets/avatar.png')}
               style={styles.avatar}
             />
           </View>

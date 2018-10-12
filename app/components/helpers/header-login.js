@@ -5,7 +5,7 @@ import {
   Image,
   ScrollView
  } from 'react-native';
-import colors from '../constants/colors';
+import colors from '../../constants/colors';
 
 
 export default class HeaderLogin extends React.Component {
@@ -16,7 +16,7 @@ export default class HeaderLogin extends React.Component {
       >
         <View style={styles.container}>
           <Image
-            source={require('../../assets/logo_2.png')}
+            source={require('../../../assets/logo_2.png')}
           ></Image>
         </View>
       </ScrollView>

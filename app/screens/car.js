@@ -10,7 +10,7 @@ import {
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
-import Buttons from './buttons/button';
+import Buttons from '../components/buttons/button';
 
 import Colors from '../constants/colors';
 import common from '../constants/common';
