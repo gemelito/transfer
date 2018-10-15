@@ -31,7 +31,7 @@ export default class Login extends Component {
   }
 
   componentDidMount() {
-    this._loadInitialState().done();
+    // this._loadInitialState().done();
   }
 
   // This method is load then finished, this componente
@@ -93,7 +93,12 @@ export default class Login extends Component {
   _storeData = async (data) => {
     try {
       await AsyncStorage.setItem('user', JSON.stringify(data));
-      this.props.navigation.navigate('Search');
+      this.props.navigation.navigate('Search',
+      {
+        Username: data.Session.User.UserName,
+        Office: data.Session.User.OfficeName
+      }
+      );
     } catch (error) {
       alert(error);
     }

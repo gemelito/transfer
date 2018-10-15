@@ -14,21 +14,47 @@ import Colors from '../../constants/colors';
 
 export default class SideMenu extends React.Component {
 
-  _removeUser = async () => {
+  constructor(props){
+    super(props);
+
+    this.state = {
+      Username: '',
+      Office: ''
+    }
+
+    this._loadingInfoUserAsync();
+  }
+
+  _loadingInfoUserAsync = async () =>{
+    try {
+      const session = await AsyncStorage.getItem('user');
+      if (session !== null) {
+        let user = JSON.parse(session);
+        this.setState({
+          Username: user.Session.User.UserName,
+          Office: user.Session.User.OfficeName
+        })
+      }
+    } catch (error) {
+      alert(error);
+    }
+  }
+
+  _signOutAsync = async () => {
     try {
       await AsyncStorage.removeItem('user');
       const session = await AsyncStorage.getItem('user');
       if (session === null) {
-        this.props.navigation.navigate('Login');
-        this.props.navigation.closeDrawer();
+        this.props.navigation.navigate('Auth');
       }
-
     } catch (error) {
-      alert("Ocurrio algo en el async")
+      alert(error);
     }
   }
 
   render() {
+    const { Username, Office} = this.state;
+    
     return (
       <View style={{flex: 1, backgroundColor: 'green'}}>
       	<TouchableOpacity onPress={() => navigateToCallback('Search')} style={styles.header_drawer}>
@@ -39,8 +65,8 @@ export default class SideMenu extends React.Component {
             />
           </View>
           <View>
-            <Text style={styles.header_drawer_h1}>PEÑA KINIL ARIEL ARMANDO</Text>
-            <Text style={styles.header_drawer_p}>Cancún - Aeropuerto</Text>
+            <Text style={styles.header_drawer_h1}>{Username}</Text>
+            <Text style={styles.header_drawer_p}>{Office}</Text>
           </View>        
         </TouchableOpacity>
 
@@ -62,7 +88,7 @@ export default class SideMenu extends React.Component {
 
         <TouchableOpacity 
           style={styles.btn_liks}
-          onPress = {this._removeUser}
+          onPress = {this._signOutAsync}
         >
           <View style={styles.space_text_icon}>
             <Ionicons name="md-log-out" size={25} color={Colors.white}/>
