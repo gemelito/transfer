@@ -9,6 +9,7 @@ import Search from './app/screens/search';
 import Car from './app/screens/car';
 import Change from './app/screens/change';
 import Verify from './app/screens/verify';
+import Camera from './app/screens/camera';
 
 
 // This header sign in user and side navbar menu
@@ -22,7 +23,8 @@ const AppHomeStack = createStackNavigator(
     Search: Search,
     Car: Car,
     Change: Change,
-    Verify: Verify
+    Verify: Verify,
+    Camera: Camera
   },
   {
     // Initial Screen component
