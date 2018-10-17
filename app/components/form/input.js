@@ -39,21 +39,22 @@ export default class InputField extends Component {
         common.border,
         common.pt_10, 
         common.pb_10, 
-        common.pl_10,
+        common.w_100,
         
         inputTop ? common.mt_10 : '',
         inputIcon ? common.row : '',
-
+        
         this.state.isFocused ? common.border_valid : common.border_black_dark,
         isEmpty ? common.border_invalid : ''
       ]}>
         <TextInput
           style={[
+            common.pl_10,
             common.pr_10,
-            common.fs_16, 
+            common.fs_16,
             common.text_black,
 
-            { width: 350, height:30 },
+            { height:30 },
 
             inputIcon ? { flex: 1 } : ''
           ]}

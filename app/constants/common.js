@@ -80,13 +80,13 @@ const common = StyleSheet.create({
     justifyContent: 'space-between'
   },
   h1: {
-    fontSize: 24
+    fontSize: 25
   },
   h2: {
-    fontSize: 20
+    fontSize: 23
   },
   h3: {
-    fontSize: 18
+    fontSize: 20
   },
 
   pl_10: {
@@ -112,8 +112,14 @@ const common = StyleSheet.create({
   mt_10: {
     marginTop: 10
   },
+  mr_5: {
+    marginRight: 5
+  },
   mr_10: {
     marginRight: 10
+  },
+  mb_10: {
+    marginBottom: 10
   },
 
   row: {
@@ -123,6 +129,12 @@ const common = StyleSheet.create({
   /** Aligns **/
   text_center: {
     alignItems: 'center'
+  },
+  left: {
+    alignItems: 'flex-start'
+  },
+  right: {
+    alignItems: 'flex-end'
   },
   text_green: {
     color: Colors.green
@@ -139,12 +151,25 @@ const common = StyleSheet.create({
   text_other_black: {
     color: Colors.other_black
   },
+  text_white: {
+    color: Colors.white
+  },
+  
 
   /** Size **/
   fs_16: {
     fontSize: 16
   },
+  fs_18: {
+    fontSize: 18
+  },
 
+  w_25: {
+    width: '25%'
+  },
+  w_45: {
+    width: '45%'
+  },
   w_45_btn: {
     width: '45%'
   },

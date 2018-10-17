@@ -49,7 +49,7 @@ export default class Login extends Component {
 
   handleChange(key, value) {
     this.setState({
-      [key]: value.toUpperCase(),
+      [key]: value,
       ["empty"+key]: false,
     });
   }
@@ -69,7 +69,7 @@ export default class Login extends Component {
     this.setState({ isLoading: true, });
     // // Do request to api send params at form
     axios.post(API.url, {
-      Username: this.state.Username,
+      Username: this.state.Username.toUpperCase(),
       Password: this.state.Password,
       Action: "Login"
     })
@@ -95,10 +95,8 @@ export default class Login extends Component {
       await AsyncStorage.setItem('user', JSON.stringify(data));
       this.props.navigation.navigate('Search',
       {
-        Username: data.Session.User.UserName,
-        Office: data.Session.User.OfficeName
-      }
-      );
+        SessionId: data.Session.SessionId,
+      });
     } catch (error) {
       alert(error);
     }

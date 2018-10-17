@@ -22,7 +22,7 @@ export default class Search extends React.Component {
     super(props);
     this.state = {
       search: '',
-      session: '',
+      SessionId: '',
       errorLabel: false,
       isLoading: false,
       isFocused: false
@@ -41,7 +41,7 @@ export default class Search extends React.Component {
      // If existe change to creen
      if (session !== null) {
       let json_user = JSON.parse(session);
-      this.state.session = json_user["Session"]["SessionId"];
+      this.state.SessionId = json_user["Session"]["SessionId"];
      }
    } catch (error) {
      alert(error);
@@ -50,7 +50,7 @@ export default class Search extends React.Component {
 
  handleChangeText = (text) => {
   this.setState({
-    search: text.toUpperCase(),
+    search: text,
     errorLabel: false,
     isFocused: true
   });
@@ -71,8 +71,8 @@ export default class Search extends React.Component {
 
     // Do request to api send params at form
     axios.post(API.url, {
-      SessionId: this.state.session,
-      Id: this.state.search,
+      SessionId: this.state.SessionId,
+      Id: this.state.search.toUpperCase(),
       Action: "GetCar"
     })
     .then((response) => {
@@ -109,9 +109,10 @@ export default class Search extends React.Component {
       }
       this.props.navigation.navigate('Car', {
         type_transfer: type_transfer,
+        SessionId: this.state.SessionId,
       });
     } catch (error) {
-      alert(error);
+      console.log(error);
     }
   }
 

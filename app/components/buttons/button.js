@@ -13,7 +13,7 @@ import common from '../../constants/common';
 
 export default class Buttons extends Component {
 	render() {
-    const { isLoading, bg, borderColor, twoButttons, textLabel, btnBorder } = this.props;
+    const { isLoading, bg, borderColor, twoButttons, textLabel, btnBorder, isDisabled } = this.props;
 		return (
 			<TouchableOpacity
 				style={[
@@ -29,6 +29,7 @@ export default class Buttons extends Component {
           isLoading   ? ''          : common.w_100,
           bg          ? bg          : common.bg_other_black,
           borderColor ? borderColor : common.border_other_black,
+          isDisabled ? { opacity: 0.5}: '', 
 				]}
 				activeOpacity={0.7}
 				{...this.props}

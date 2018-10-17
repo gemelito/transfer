@@ -45,6 +45,7 @@ export default class Car extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+      SessionId: this.props.navigation.getParam('SessionId', 'NO-IU'),
       num_economic: '',
       model: '',
       version: '',
@@ -138,7 +139,10 @@ export default class Car extends React.Component {
               borderColor={common.bg_yellow}
               bg={common.border_yellow}
               textLabel="SIGUIENTE"
-              onPress={() => this.props.navigation.navigate('Change') }
+              onPress={() => this.props.navigation.navigate('Change',{
+                SessionId: this.state.SessionId,
+              }
+              ) }
             />
           </View>
 

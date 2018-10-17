@@ -19,10 +19,9 @@ export default class AuthLoading extends React.Component {
     try {
       // Get data of user, if existe any.
       const session = await AsyncStorage.getItem('user');
+      this.props.navigation.navigate(session ? 'App' : 'Auth');
       // This will switch to the App screen or Auth screen and this loading
       // screen will be unmounted and thrown away.
-      this.props.navigation.navigate(session ? 'App' : 'Auth');
-      // this.props.navigation.navigate('Search');
     } catch (error) {
       alert(error);
     }

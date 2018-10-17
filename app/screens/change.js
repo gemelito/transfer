@@ -4,11 +4,16 @@ import {
   View,
   Picker,
   Text,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  ActivityIndicator
 } from 'react-native';
+import axios from 'axios';
+
+import Buttons from '../components/buttons/button';
 
 import Colors from '../constants/colors';
-
+import common from '../constants/common';
+import API from '../constants/base_url';
 
 
 export default class Change extends React.Component {
@@ -17,227 +22,328 @@ export default class Change extends React.Component {
     super(props);
 
     this.state = {
+      Cities: [],
+      SessionId: this.props.navigation.getParam('SessionId'),
 
+      PlaceOrigin: '',
+      isEnabledPlaceOrigin: true,
+      OfficePlaceOrigin: '',
+      isEnabledOfficePlaceOrigin: false,
+
+      PlaceDestination: '',
+      isEnabledPlaceDestination: true,
+      OfficePlaceDestination: '',
+      isEnabledOfficePlaceDestination: false,
+
+      CityId: 0,
+
+      StationsPlaceOrigin: [],
+      StationsPlaceDestination: [],
+
+      isLoading: false,
+      isDisabled: false,
+
+      isErrorPlaceOrigin: false,
+      isErrorOfficePlaceOrigin: false,
+      isErrorPlaceDestination: false,
+      isErrorOfficePlaceDestination: false
     }
+    
+    this.handleChangeSelectPlace = this.handleChangeSelectPlace.bind(this);
+    this.handleValidate          = this.handleValidate.bind(this);
+    this._loadCity().done();
+  }
+  
+  componentDidMount(){
+  }
+
+
+  _loadCity= async () =>{
+    // Do request to api send params at form
+    axios.post(API.url, {
+      SessionId: this.state.SessionId,
+      Id: '0',
+      Action: "GetCityList"
+    })
+    .then((response) => {
+      // Get response, if response (Success) was true change to screen
+      if (response.data.result.Success && response.data.result.Success === true) {
+        this.setState({ Cities: response.data.result.BaseObjectList});
+        setTimeout( () => {
+          this.setState({ isLoading: true });
+        },1000);
+      } else {
+        alert(response.data.result.ErrorDescription);
+      }
+    })
+    .catch((error) => {
+      // If exist error finished animation and show error
+      alert(error);
+    });
+  }
+
+  handleChangeSelectPlace(key, value) {
+    this.setState({
+      [key]: value,
+      CityId: value,
+      ["isEnabledOffice" + key]: false,
+      ["isEnabled" +key]: false
+    });
+    setTimeout(() => {
+      (this.state.CityId > 0) ? this._getStation(key) : this.setState({ ["Stations" + key]: [] });
+    }, 1000);
+  }
+
+  _getStation(key){
+    axios.post(API.url, {
+      CityId: this.state.CityId,
+      SessionId: this.state.SessionId,
+      Id: '0',
+      Action: "GetStationList"
+    })
+    .then((response) => {
+      // Get response, if response (Success) was true change to screen
+      if (response.data.result.Success && response.data.result.Success === true) {
+        if (response.data.result.BaseObjectList === null){
+          alert("No se han encontrado resultados");
+          this.setState({
+            ["isEnabledOffice" + key]: false,
+            ["isEnabled" + key]: true
+          });
+        }else{
+          this.setState({ ["Stations"+ key]: response.data.result.BaseObjectList });
+          this.setState({
+            ["isEnabledOffice" + key]: true,
+            ["isEnabled" + key]: true
+          });
+        }
+      } else {
+        alert(response.data.result.ErrorDescription);
+      }
+    })
+    .catch((error) => {
+      // If exist error finished animation and show error
+      alert(error);
+    });
+  }
+
+  handleValidate(){
+    const { 
+      PlaceOrigin, OfficePlaceOrigin, 
+      PlaceDestination, OfficePlaceDestination
+    } = this.state;
+    // let inputFields = [
+    //   { "name": "PlaceOrigin", "value": PlaceOrigin},
+    //   { "name": "OfficePlaceOrigin", "value": OfficePlaceOrigin},
+    //   { "name": "PlaceDestination", "value": PlaceDestination},
+    //   { "name": "OfficePlaceDestination", "value": OfficePlaceDestination},
+    // ];
+    // inputFields.map((input, index) =>{
+    //   (input.value === '') ? this.setState({ ["isError" + input.name]: true }) : this.setState({ ["isError" + input.name]: false });
+    // }); 
+    // return;
+    if (PlaceOrigin === '' || OfficePlaceOrigin === '' || 
+        PlaceDestination === '' || OfficePlaceDestination === ''){
+      return alert("Se deben llenar todos los campos");
+    }
+    this.handleSubmit();
+  }
+
+  handleSubmit(){
+    const  {
+      PlaceOrigin, OfficePlaceOrigin,
+      PlaceDestination, OfficePlaceDestination, SessionId
+    } = this.state;
+    this.setState({ isLoading: false, });
+    // console.log("Plaza origin es: " + PlaceOrigin, "y la oficina origin es: ", OfficePlaceOrigin);
+    // console.log("----------");
+    // console.log("Plaza destino es: " + PlaceDestination, "y la oficina destino es: ", OfficePlaceDestination);
+    
+    // Do request to api send params at form
+    axios.post(API.url, {
+      PickupCityId: PlaceOrigin,
+      PickupStationId: OfficePlaceOrigin,
+      DropoffCityId: PlaceDestination,
+      DropoffStationId: OfficePlaceDestination,
+      SessionId: SessionId,
+      Id:0,
+      Action: "SetStationFromTo"
+    })
+    .then((response) => {
+      // Get response, if response (Success) was true change to screen
+      if (response.data.result.Success && response.data.result.Success === true) {
+        this.setState({ isLoading: true });
+        this.props.navigation.navigate('Verify', {
+          SessionId: SessionId,
+        });
+      } else {
+        alert(response.data.result.ErrorDescription);
+        this.setState({ isLoading: true });
+      }
+    })
+    .catch((error) => {
+      // If exist error finished animation and show error
+      this.setState({ isLoading: true });
+    });
   }
 
   render() {
-    return (
-      <View style={[styles.flex_1, styles.bg_white]}>
+    const { 
+      Cities,
+      PlaceOrigin,
+      isEnabledPlaceOrigin,
+      OfficePlaceOrigin, 
+      isEnabledOfficePlaceOrigin,
 
-        <View style={[styles.ml_10, styles.mr_10]}>
-          <Text style={[
-            styles.text_center, 
-            styles.h1, 
-            styles.text_other_black, 
-            styles.pt_10, 
-            styles.pb_10,
-            styles.text_other_black
-          ]}>Seleccione oficina de origen</Text>
+      PlaceDestination, 
+      isEnabledPlaceDestination,
+      OfficePlaceDestination,
+      isEnabledOfficePlaceDestination,
 
-          <View style={[styles.border, styles.mb_10, styles.border_dark,]}>
-            <Picker
-              selectedValue={this.state.language}
-              onValueChange={(itemValue, itemIndex) => this.setState({language: itemValue})}>
-              <Picker.Item label="Java" value="java"  color={Colors.black}/>
-              <Picker.Item label="JavaScript" value="js" color={Colors.black}/>
-            </Picker>
+      isLoading,
+      isDisabled,
+      StationsPlaceOrigin,
+      StationsPlaceDestination,
+
+      isErrorPlaceOrigin,
+      isErrorOfficePlaceOrigin,
+      isErrorPlaceDestination,
+      isErrorOfficePlaceDestination
+
+    } = this.state;
+
+    const pickerItems = Cities.map((item) => {
+      return (<Picker.Item label={item.Name} value={item.Id} color={Colors.black} key={item.Id} />)
+    });
+
+    const itemsStationOrigin = StationsPlaceOrigin.map((item) => {
+      return (<Picker.Item label={item.Name} value={item.Id} color={Colors.black} key={item.Id} />)
+    });
+
+    const itemsStationDestination = StationsPlaceDestination.map((item) => {
+      return (<Picker.Item label={item.Name} value={item.Id} color={Colors.black} key={item.Id} />)
+    });
+    
+    if (isLoading){
+
+      return (      
+        <View style={[common.flex_1, common.bg_white]}>
+  
+          <View style={[common.ml_10, common.mr_10]}>
+            <Text style={[common.text_center, common.h1, common.text_other_black, common.pt_10, common.pb_10, common.text_other_black]}>
+              Seleccione oficina de origen
+            </Text>
+  
+            <View style={[common.border, common.mb_10, isErrorPlaceOrigin ? common.border_invalid : common.border_black_dark,]}>
+              <Picker
+                enabled={isEnabledPlaceOrigin}
+                selectedValue={PlaceOrigin}
+                onValueChange={value => this.handleChangeSelectPlace("PlaceOrigin", value) }>
+                <Picker.Item label="Selecciona plaza origen" value="0"  color={Colors.other_black} key={0} />
+                {pickerItems}
+              </Picker>
+            </View>
+  
+            <View style={[common.border, isErrorOfficePlaceOrigin ? common.border_invalid : common.border_black_dark,]}>
+              <Picker
+                enabled={isEnabledOfficePlaceOrigin}
+                selectedValue={OfficePlaceOrigin}
+                onValueChange={(value) => this.setState({ OfficePlaceOrigin: value }) }>
+                <Picker.Item label="Selecciona oficina origen" value={0} color={Colors.other_black} key={0} />
+                {itemsStationOrigin}
+              </Picker>
+            </View>
+            {/* First section select */}
+  
+            <Text style={[
+              common.text_center, 
+              common.h1, 
+              common.text_other_black, 
+              common.pt_10, 
+              common.pb_10,
+              common.mt_10,
+              common.text_other_black
+            ]}>Seleccione oficina de destino</Text>
+            <View style={[common.border, common.mb_10, isErrorPlaceDestination ? common.border_invalid : common.border_black_dark,]}>
+              <Picker
+                selectedValue={PlaceDestination}
+                onValueChange={value => this.handleChangeSelectPlace("PlaceDestination", value)}>
+                <Picker.Item label="Selecciona plaza destino" value="0" color={Colors.other_black} key={0}/>
+                { pickerItems }
+              </Picker>
+            </View>
+            <View style={[common.border, isErrorOfficePlaceDestination ? common.border_invalid : common.border_black_dark,]}>
+              <Picker
+                enabled={isEnabledOfficePlaceDestination}
+                selectedValue={OfficePlaceDestination}
+                onValueChange={ (value) => this.setState({ OfficePlaceDestination: value})}>
+                <Picker.Item label="Selecciona oficina destino" value={0} color={Colors.other_black} key={0}/>
+                {itemsStationDestination}
+              </Picker>
+            </View>
+            {/* Second section select */}
+  
           </View>
+          {/* Container section selectors */}
+  
+          <View
+            style={[
+              common.display_flex,
+              common.row,
+              common.absolute,
+              common.space_between,
+              common.w_100,
+              common.bottom_0,
+              common.pb_20,
+            ]}
+          >
 
-          <View style={[styles.border, styles.border_dark]}>
-            <Picker
-              selectedValue={this.state.language}
-              onValueChange={(itemValue, itemIndex) => this.setState({language: itemValue})}>
-              <Picker.Item label="Java" value="java" />
-              <Picker.Item label="JavaScript" value="js" />
-            </Picker>
-          </View>
-          {/* First section select */}
-
-          <Text style={[
-            styles.text_center, 
-            styles.h1, 
-            styles.text_other_black, 
-            styles.pt_10, 
-            styles.pb_10,
-            styles.mt_10,
-            styles.text_other_black
-          ]}>Seleccione oficina de destino</Text>
-          <View style={[styles.border, styles.mb_10, styles.border_dark]}>
-            <Picker
-              selectedValue={this.state.language}
-              onValueChange={(itemValue, itemIndex) => this.setState({language: itemValue})}>
-              <Picker.Item label="Java" value="java" />
-              <Picker.Item label="JavaScript" value="js" />
-            </Picker>
-          </View>
-          <View style={[styles.border, styles.border_dark]}>
-            <Picker
-              selectedValue={this.state.language}
-              onValueChange={(itemValue, itemIndex) => this.setState({language: itemValue})}>
-              <Picker.Item label="Java" value="java" />
-              <Picker.Item label="JavaScript" value="js" />
-            </Picker>
-          </View>
-          {/* Second section select */}
-
-        </View>
-        {/* Container section selectors */}
-
-        <View style={[styles.display_flex, styles.row, styles.absolute, styles.w_100, styles.bottom_0, styles.space_between, styles.pb_20]}>
-
-            <View style={[styles.w_45, styles.ml_10]}>
-              <TouchableWithoutFeedback onPress={() => this.props.navigation.goBack()}>
-                <View style={[styles.border, styles.border_green, styles.pt_10, styles.pb_10, styles.text_center, ]}>
-                  <Text style={[styles.text_black, styles.bold]}>
-                    REGRESAR
-                  </Text>
-                </View>
-              </TouchableWithoutFeedback>
+            <View style={[common.w_45_btn, common.ml_10]}>
+              <Buttons
+                borderColor={common.border_green}
+                bg={common.bg_transparent}
+                textLabel="REGRESAR"
+                onPress={() => this.props.navigation.goBack()}
+              />
             </View>
 
-            <View style={[styles.w_45, styles.mr_10]}>
-              <TouchableWithoutFeedback>
-                <View style={[styles.border, styles.border_yellow, styles.bg_yellow, styles.pt_10,  styles.pb_10, styles.text_center, ]}>
-                  <Text style={[styles.text_black, styles.bold]}>
-                    SIGUIENTE
-                  </Text>
-                </View>
-              </TouchableWithoutFeedback>
+            <View style={[common.w_45_btn, common.mr_10]}>
+              <Buttons
+                isDisabled={isDisabled}
+                disabled={isDisabled}
+                borderColor={common.bg_yellow}
+                bg={common.border_yellow}
+                textLabel="SIGUIENTE"
+                onPress={this.handleValidate}
+              />
             </View>
 
+          </View>
+          {/* Botones */}
+          {/* Botones */}
+  
         </View>
-        {/* Botones */}
+        // Main containter
+      );
 
-      </View>
-      // Main containter
-    );
+    }else{
+      return (
+        <View style={styles.center}>
+          <ActivityIndicator size={70} color="#037B00" />
+          {/* <StatusBar barStyle="default" /> */}
+        </View>
+      );
+    }
   }
 }
 
+
 const styles = StyleSheet.create({
-
-  btn: {
-    width: 165,
-    borderWidth: 1,
-    borderRadius: 5,
-  },
-
-  border: {
-    borderWidth: 1,
-    borderRadius: 5,
-  },
-
-  bold: {
-    fontWeight: 'bold'
-  },
-  border_dark: {
-    borderColor: Colors.black_dark
-  },
-  border_black: {
-    borderColor: Colors.black
-  },
-  border_other_black:{
-    borderColor: Colors.other_black
-  },
-  border_green: {
-    borderColor: Colors.green,
-  },
-  border_yellow: {
-    borderColor: Colors.yellow,
-  },
-  bg_white: {
-    backgroundColor: Colors.white
-  },
-  bg_light: {
-    backgroundColor: Colors.black_light
-  },
-  bg_yellow: {
-    backgroundColor: Colors.yellow
-  },
-  bottom_0: {
-    bottom: 0
-  },
-
-  flex_1: {
-    flex: 1
-  },
-  display_flex:{
-    display:'flex'
-  },
-  row: {
-    flexDirection: 'row',
-  },
-  column: {
-    flexDirection: 'column',
-  },
-  space_between: {
-    justifyContent: 'space-between'
-  },
-
-  h1: {
-    fontSize: 24
-  },
-  h2: {
-    fontSize: 20
-  },
-  h3: {
-    fontSize: 18
-  },
-
-
-
-  mt_10: {
-    marginTop: 10
-  },
-  mb_10: {
-    marginBottom: 10
-  },
-  ml_10: {
-    marginLeft: 10
-  },
-  mr_10: {
-    marginRight: 10
-  },
-
-
-  pl_10: {
-    paddingLeft: 10
-  },
-  pt_10: {
-    paddingTop: 10
-  },
-  pt_5: {
-    paddingTop: 5
-  },
-  pb_10: {
-    paddingBottom: 10
-  },
-  pb_20: {
-    paddingBottom: 20
-  },
-
-  absolute: {
-    position: 'absolute'
-  },
-
-  text_center: {
+  center: {
+    flex: 2,
+    backgroundColor: '#fff',
     alignItems: 'center',
-  },
-  text_black: {
-    color: Colors.black
-  },
-  text_other_black: {
-    color: Colors.other_black
-  },
-  text_black_dark: {
-    color: Colors.black_dark
+    justifyContent: 'center',
   },
 
-  w_45: {
-    width: '45%'
-  },
-  w_100: {
-    width: '100%'
-  }
 });
