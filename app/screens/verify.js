@@ -1,19 +1,21 @@
 import React from 'react';
 import {
-  StyleSheet,
   View,
   Text,
-  Platform,
   KeyboardAvoidingView,
   Picker,
   AsyncStorage,
   ActivityIndicator,
   Image,
   ImageBackground,
-  TouchableOpacity
+  TouchableOpacity,
+  Dimensions,
+  Alert
 } from 'react-native';
 import axios from 'axios';
 import { MaterialIcons } from '@expo/vector-icons';
+
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 import Buttons from '../components/buttons/button';
 import InputField from '../components/form/input';
@@ -27,27 +29,24 @@ const CAR = require('../../assets/car.png');
 const EMPTY = require('../../assets/square-empty.png');
 const FILLED = require('../../assets/square-filled.png');
 
+const ex = {
+  width: Dimensions.get('window').width,
+  height: Dimensions.get('window').height
+}
+const width = (ex.width >= 768 && ex.height >= 1024) ? wp('80%') : wp('62%');
+
 export default class Verify extends React.Component {
 
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.getParam('type_transfer', 'A Nested Details Screen'),
       headerBackTitle: null,
-      headerStyle: {
-        // backgroundColor: '#0D2143',
-        // position: 'absolute',
-        // height: 50,
-        // top: 0,
-        // left: 0,
-        // right: 0,
-      },
       headerTitleStyle: {
         alignSelf: 'center',
         textAlign: 'center',
-        width: '70%',
+        width: width,
         color: Colors.other_black
       },
-      // headerTintColor: 'green',
     };
   };
 
@@ -102,11 +101,11 @@ export default class Verify extends React.Component {
         }, 1000)
       }
     } catch (error) {
-      alert(error);
-      // Return to search the state every second
-      setInterval(() => {
-        this.props.navigation.goBack()
-      }, 5000);
+      Alert.alert(
+        'Advertencia',
+        `${error}`,
+        [{ text: 'CANCELAR' }]
+      );
     }
   }
 
@@ -124,14 +123,10 @@ export default class Verify extends React.Component {
   }
 
   handleChange = (key, value) => {
-    // if ( key === "kms" && isNaN(value)) {
-    //   alert("Debe ser un numero")
-    // }
     this.setState({
       [key]: value,
       ["empty" + key]: false,
     });
-
   }
 
   handleSubmit = () => {
@@ -141,11 +136,19 @@ export default class Verify extends React.Component {
       return false;
     }
     if (picture === null) {
-      alert("Se debe tomar la foto");
+      Alert.alert(
+        'Advertencia',
+        'Se debe tomar la foto',
+        [{ text: 'CANCELAR' }]
+      );
       return false;
     }
     if (isNaN(kms)) {
-      alert("El kilometraje debe ser númerico");
+      Alert.alert(
+        'Advertencia',
+        'El kilometraje debe ser númerico',
+        [{ text: 'CANCELAR' }]
+      );
       return false;
     }
     this.setState({ isLoading: false, });
@@ -160,22 +163,28 @@ export default class Verify extends React.Component {
     .then((response) => {
       // Get response, if response (Success) was true change to screen
       if (response.data.result.Success && response.data.result.Success === true) {
-        // console.log(response.data);
         this.setState({ isLoading: true });
-        // setTimeout( () => { 
           this.props.navigation.navigate('Finalize', {
             SessionId: SessionId,
             type_transfer: typeTransfer,
           });
-        // }, 1000);
       } else {
-        alert(response.data.result.ErrorDescription);
         this.setState({ isLoading: true });
+        Alert.alert(
+          'Advertencia',
+          `${response.data.result.ErrorDescription}`,
+          [{ text: 'CANCELAR' }]
+        );
       }
     })
     .catch((error) => {
       // If exist error finished animation and show error
       this.setState({ isLoading: true });
+      Alert.alert(
+        'Error',
+        `${error}`,
+        [{ text: 'CANCELAR' }]
+      );
     });
   }
 
@@ -404,7 +413,6 @@ export default class Verify extends React.Component {
       return (
         <View style={[common.flex_2, common.bg_white, common.center]}>
           <ActivityIndicator size={70} color="#037B00" />
-          {/* <StatusBar barStyle="default" /> */}
         </View>
       );
     }

@@ -4,14 +4,14 @@ import {
   KeyboardAvoidingView,
   TextInput,
   AsyncStorage,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
 import Buttons from '../components/buttons/button';
 
-import Colors from '../constants/colors';
 import common from '../constants/common';
 import API from '../constants/base_url';
 
@@ -36,15 +36,19 @@ export default class Search extends React.Component {
  // This method is load then finished, this componente
  _loadInitialState = async () => {
    try {
-     // Get data of user, if existe any.
-     const session = await AsyncStorage.getItem('user');
-     // If existe change to creen
-     if (session !== null) {
-      let json_user = JSON.parse(session);
-      this.state.SessionId = json_user["Session"]["SessionId"];
-     }
+      // Get data of user, if existe any.
+      const session = await AsyncStorage.getItem('user');
+      // If existe change to creen
+      if (session !== null) {
+        let json_user = JSON.parse(session);
+        this.state.SessionId = json_user["Session"]["SessionId"];
+      }
    } catch (error) {
-     alert(error);
+     Alert.alert(
+       'Error',
+       `${error}`,
+       [{ text: 'CANCELAR' }]
+     );
    }
  }
 
@@ -80,7 +84,16 @@ export default class Search extends React.Component {
       if (response.data.result.Success && response.data.result.Success === true) {
         this._storeData(response.data.result);
       } else {
-        alert(response.data.result.ErrorDescription);
+        Alert.alert(
+          // This is Alert Dialog Title
+          'Advertencia',
+          // This is Alert Dialog Message. 
+          `${response.data.result.ErrorDescription}`,
+          [ 
+            // Third OK Button in Alert Dialog
+            { text: 'CANCELAR' },
+          ]
+        );
         this.setState({
           isLoading: false,
           search: '',
@@ -90,10 +103,12 @@ export default class Search extends React.Component {
     })
     .catch((error) => {
       // If exist error finished animation and show error
-      this.setState({
-        isLoading: false
-      });
-      alert(error);
+      Alert.alert(
+        'Error',
+        `${error}`,
+        [ { text: 'CANCELAR' }]
+      );
+      this.setState({ isLoading: false});
     });
   }
 
@@ -110,7 +125,11 @@ export default class Search extends React.Component {
         SessionId: this.state.SessionId,
       });
     } catch (error) {
-      console.log(error);
+      Alert.alert(
+        'Error',
+        `${error}`,
+        [{ text: 'CANCELAR' }]
+      );
     }
   }
 
@@ -176,7 +195,6 @@ export default class Search extends React.Component {
       return (
         <View style={[common.flex_2, common.center, common.bg_white]}>
           <ActivityIndicator size={70} color="#037B00" />
-          {/* <StatusBar barStyle="default" /> */}
         </View>
       );
     }

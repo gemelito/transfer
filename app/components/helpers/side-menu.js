@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
   AsyncStorage,
+  Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -36,19 +37,27 @@ export default class SideMenu extends React.Component {
         })
       }
     } catch (error) {
-      alert(error);
+      Alert.alert(
+        'Error',
+        error,
+        [{ text: 'CANCELAR' }]
+      );
     }
   }
 
   _signOutAsync = async () => {
     try {
-      await AsyncStorage.removeItem('user');
+      await AsyncStorage.clear();
       const session = await AsyncStorage.getItem('user');
       if (session === null) {
         this.props.navigation.navigate('Auth');
       }
     } catch (error) {
-      alert(error);
+      Alert.alert(
+        'Error',
+        error,
+        [{ text: 'CANCELAR' }]
+      );
     }
   }
 

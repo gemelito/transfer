@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, KeyboardAvoidingView, AsyncStorage, ActivityIndicator } from 'react-native';
+import { View, KeyboardAvoidingView, AsyncStorage, ActivityIndicator, Alert } from 'react-native';
 import axios from 'axios';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
@@ -30,22 +30,7 @@ export default class Login extends Component {
     this.handleValidate = this.handleValidate.bind(this);
   }
 
-  componentDidMount() {
-    // this._loadInitialState().done();
-  }
-
-  // This method is load then finished, this componente
-  _loadInitialState = async () => {
-    try {
-      // Get data of user, if existe any.
-      const session = await AsyncStorage.getItem('user');
-      // If existe change to creen
-      if (session !== null) 
-        this.props.navigation.navigate('Search');
-    } catch (error) {
-      alert("Ocurrio algo en el async")
-    }
-  }
+  componentDidMount() {}
 
   handleChange(key, value) {
     this.setState({
@@ -79,14 +64,22 @@ export default class Login extends Component {
         this._storeData(response.data.result);
         
       } else {
-        alert(response.data.result.ErrorDescription);
+        Alert.alert(
+          'Error',
+          `${response.data.result.ErrorDescription}`,
+          [{ text: 'CANCELAR' }]
+        );
         this.setState({ isLoading: false });
       }
     })
     .catch((error) => {
       // If exist error finished animation and show error
+      Alert.alert(
+        'Error',
+        `${error}`,
+        [{ text: 'CANCELAR' }]
+      );
       this.setState({isLoading: false});
-      alert(error);
     });
   }
 
@@ -156,7 +149,6 @@ export default class Login extends Component {
     }else{return (
         <View style={[common.flex_2,common.center, common.bg_white]}>
           <ActivityIndicator size={70} color="#037B00" />
-          {/* <StatusBar barStyle="default" /> */}
         </View>
       );
     }

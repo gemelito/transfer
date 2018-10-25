@@ -5,16 +5,23 @@ import {
   Picker,
   Text,
   AsyncStorage,
-  ActivityIndicator
+  ActivityIndicator,
+  Dimensions,
+  Alert
 } from 'react-native';
 import axios from 'axios';
-
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Buttons from '../components/buttons/button';
 
 import Colors from '../constants/colors';
 import common from '../constants/common';
 import API from '../constants/base_url';
 
+const ex = {
+  width: Dimensions.get('window').width,
+  height: Dimensions.get('window').height
+}
+const width = (ex.width >= 768 && ex.height >= 1024) ? wp('80%') : wp('62%');
 
 export default class Change extends React.Component {
 
@@ -22,21 +29,12 @@ export default class Change extends React.Component {
     return {
       title: navigation.getParam('type_transfer', 'A Nested Details Screen'),
       headerBackTitle: null,
-      headerStyle: {
-        // backgroundColor: '#0D2143',
-        // position: 'absolute',
-        // height: 50,
-        // top: 0,
-        // left: 0,
-        // right: 0,
-      },
       headerTitleStyle: {
         alignSelf: 'center',
         textAlign: 'center',
-        width: '70%',
+        width: width,
         color: Colors.other_black
       },
-      // headerTintColor: 'green',
     };
   };
 
@@ -74,7 +72,7 @@ export default class Change extends React.Component {
     
     this.handleChangeSelectPlace = this.handleChangeSelectPlace.bind(this);
     this.handleValidate          = this.handleValidate.bind(this);
-    this._loadCity().done();
+    this._loadCity();
   }
   
   async componentDidMount(){
@@ -101,19 +99,30 @@ export default class Change extends React.Component {
             if (response.data.result.Success && response.data.result.Success === true) {
               this.setState({ StationsPlaceOrigin: response.data.result.BaseObjectList });
             } else {
-              alert(response.data.result.ErrorDescription);
+              Alert.alert(
+                'Advertencia',
+                `${response.data.result.ErrorDescription}`,
+                [{ text: 'CANCELAR' }]
+              );
             }
           })
           .catch((error) => {
             // If exist error finished animation and show error
-            alert(error);
+            Alert.alert(
+              'Error',
+              `${error}`,
+              [{ text: 'CANCELAR' }]
+            );
           });
         }
       } catch (error) {
-        alert(error);
+        Alert.alert(
+          'Error',
+          `${error}`,
+          [{ text: 'CANCELAR' }]
+        );
       }
     }
-    console.log(this.state.OfficePlaceOrigin);
   }
 
   _loadCity= async () =>{
@@ -131,12 +140,19 @@ export default class Change extends React.Component {
           this.setState({ isLoading: true });
         },1000);
       } else {
-        alert(response.data.result.ErrorDescription);
+        Alert.alert(
+          'Advertencia',
+          `${response.data.result.ErrorDescription}`,
+          [{ text: 'CANCELAR' }]
+        );
       }
     })
     .catch((error) => {
-      // If exist error finished animation and show error
-      alert(error);
+      Alert.alert(
+        'Error',
+        `${error}`,
+        [{ text: 'CANCELAR' }]
+      );
     });
   }
 
@@ -163,7 +179,11 @@ export default class Change extends React.Component {
       // Get response, if response (Success) was true change to screen
       if (response.data.result.Success && response.data.result.Success === true) {
         if (response.data.result.BaseObjectList === null){
-          alert("No se han encontrado resultados");
+          Alert.alert(
+            'Advertencia',
+            'No se han encontrado resultados',
+            [{ text: 'CANCELAR' }]
+          );
           this.setState({
             ["isEnabledOffice" + key]: false,
             ["isEnabled" + key]: true
@@ -176,12 +196,20 @@ export default class Change extends React.Component {
           });
         }
       } else {
-        alert(response.data.result.ErrorDescription);
+        Alert.alert(
+          'Advertencia',
+          `${response.data.result.ErrorDescription}`,
+          [{ text: 'CANCELAR' }]
+        );
       }
     })
     .catch((error) => {
       // If exist error finished animation and show error
-      alert(error);
+      Alert.alert(
+        'Error',
+        `${error}`,
+        [{ text: 'CANCELAR' }]
+      );
     });
   }
 
@@ -190,19 +218,13 @@ export default class Change extends React.Component {
       PlaceOrigin, OfficePlaceOrigin, 
       PlaceDestination, OfficePlaceDestination
     } = this.state;
-    // let inputFields = [
-    //   { "name": "PlaceOrigin", "value": PlaceOrigin},
-    //   { "name": "OfficePlaceOrigin", "value": OfficePlaceOrigin},
-    //   { "name": "PlaceDestination", "value": PlaceDestination},
-    //   { "name": "OfficePlaceDestination", "value": OfficePlaceDestination},
-    // ];
-    // inputFields.map((input, index) =>{
-    //   (input.value === '') ? this.setState({ ["isError" + input.name]: true }) : this.setState({ ["isError" + input.name]: false });
-    // }); 
-    // return;
     if (PlaceOrigin === '' || OfficePlaceOrigin === '' || 
         PlaceDestination === '' || OfficePlaceDestination === ''){
-      return alert("Se deben llenar todos los campos");
+      return Alert.alert(
+        'Advertencia',
+        'Se deben llenar los campos faltantes',
+        [{ text: 'CANCELAR' }]
+      );
     }
     this.handleSubmit();
   }
@@ -233,13 +255,22 @@ export default class Change extends React.Component {
           type_transfer: typeTransfer,
         });
       } else {
-        alert(response.data.result.ErrorDescription);
         this.setState({ isLoading: true });
+        Alert.alert(
+          'Advertencia',
+          `${response.data.result.ErrorDescription}`,
+          [{ text: 'CANCELAR' }]
+        );
       }
     })
     .catch((error) => {
       // If exist error finished animation and show error
       this.setState({ isLoading: true });
+      Alert.alert(
+        'Error',
+        `${error}`,
+        [{ text: 'CANCELAR' }]
+      );
     });
   }
 
@@ -385,7 +416,6 @@ export default class Change extends React.Component {
       return (
         <View style={styles.center}>
           <ActivityIndicator size={70} color="#037B00" />
-          {/* <StatusBar barStyle="default" /> */}
         </View>
       );
     }

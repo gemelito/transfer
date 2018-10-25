@@ -77,11 +77,11 @@ export default class Car extends React.Component {
         });
       }
     } catch (error) {
-      alert(error);
-      // Return to search the state every second
-      setInterval(() => {
-        this.props.navigation.goBack()
-      }, 5000);
+      Alert.alert(
+        'Error',
+        `${error}`,
+        [{ text: 'CANCELAR' }]
+      );
     }
   }
 
