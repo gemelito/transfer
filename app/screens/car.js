@@ -1,28 +1,28 @@
 import React from 'react';
 import {
-  commonheet,
   View,
-  Platform,
   AsyncStorage,
   Text,
-  TouchableWithoutFeedback
+  Dimensions
 } from 'react-native';
-import axios from 'axios';
-import { Ionicons } from '@expo/vector-icons';
 
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Buttons from '../components/buttons/button';
 
 import Colors from '../constants/colors';
 import common from '../constants/common';
 
-import API from '../constants/base_url';
-
+const ex = {
+  width: Dimensions.get('window').width,
+  height: Dimensions.get('window').height
+}
+const width = (ex.width >= 768 && ex.height >= 1024) ? wp('80%') : wp('62%');
 
 export default class Car extends React.Component {
   
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.getParam('type_transfer', 'A Nested Details Screen'),
+      title: navigation.getParam('type_transfer', 'RECIBIR'),
       headerBackTitle: null,
       headerStyle: {
         // backgroundColor: '#0D2143',
@@ -35,7 +35,8 @@ export default class Car extends React.Component {
       headerTitleStyle: {
         alignSelf: 'center',
         textAlign: 'center',
-        width: '70%',
+        
+        width: width,
         color: Colors.other_black
       },
       // headerTintColor: 'green',
@@ -46,6 +47,7 @@ export default class Car extends React.Component {
     super(props);
     this.state = {
       SessionId: this.props.navigation.getParam('SessionId', 'NO-IU'),
+      typeTransfer: this.props.navigation.getParam('type_transfer', 'NO-TYPE-TRANSFER'),
       num_economic: '',
       model: '',
       version: '',
@@ -86,22 +88,22 @@ export default class Car extends React.Component {
   render() {
     return (
       <View style={[common.flex_1, common.bg_white]}>
-        <View style={[common.text_center, common.pt_10, common.pb_10, common.mt_10]}>
-          <Text style={[common.h1, common.text_other_black,]}>Verifique la información del auto</Text>
+        <View style={[common.pt_10, common.pb_10, common.mt_10]}>
+          <Text style={[common.text_center,common.h1, common.text_other_black,]}>Verifique la información del auto</Text>
         </View>
         <View style={[common.bg_light, common.ml_10, common.mt_10, common.mr_10, common.pb_10]}>
           <Text style={[common.h2, common.text_black_dark, common.pl_10, common.pt_10, common.pb_10, common.bold]}>DATOS DEL AUTO</Text>
 
           <View style={{flexDirection: 'row'}}>
           
-            <View style={{width: 160, paddingLeft:10}}>
+            <View style={[common.w_45, common.pl_10, common.pr_10, common.mr_10]}>
               <Text style={[common.h3, common.text_other_black]}>No. Económico:</Text>
               <Text style={[common.h3, common.pt_10, common.text_other_black]}>Modelo:</Text>
               <Text style={[common.h3, common.pt_10, common.text_other_black]}>Version:</Text>
               <Text style={[common.h3, common.pt_10, common.text_other_black]}>Placas:</Text>
               <Text style={[common.h3, common.pt_10, common.text_other_black]}>Color:</Text>
             </View>
-            <View style={{width: 200, paddingRight:10}}>
+            <View style={[common.w_45, common.pr_10]}>
               <Text style={[common.h3, common.text_other_black]}>{this.state.num_economic}</Text>
               <Text style={[common.h3, common.pt_10, common.text_other_black]}>{this.state.model}</Text>
               <Text style={[common.h3, common.pt_10, common.text_other_black]}>{this.state.version}</Text>
@@ -141,6 +143,7 @@ export default class Car extends React.Component {
               textLabel="SIGUIENTE"
               onPress={() => this.props.navigation.navigate('Change',{
                 SessionId: this.state.SessionId,
+                type_transfer: this.state.typeTransfer
               }
               ) }
             />

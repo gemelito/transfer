@@ -4,7 +4,7 @@ import {
   View,
   Picker,
   Text,
-  TouchableWithoutFeedback,
+  AsyncStorage,
   ActivityIndicator
 } from 'react-native';
 import axios from 'axios';
@@ -18,12 +18,35 @@ import API from '../constants/base_url';
 
 export default class Change extends React.Component {
 
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: navigation.getParam('type_transfer', 'A Nested Details Screen'),
+      headerBackTitle: null,
+      headerStyle: {
+        // backgroundColor: '#0D2143',
+        // position: 'absolute',
+        // height: 50,
+        // top: 0,
+        // left: 0,
+        // right: 0,
+      },
+      headerTitleStyle: {
+        alignSelf: 'center',
+        textAlign: 'center',
+        width: '70%',
+        color: Colors.other_black
+      },
+      // headerTintColor: 'green',
+    };
+  };
+
   constructor(props){
     super(props);
 
     this.state = {
       Cities: [],
       SessionId: this.props.navigation.getParam('SessionId'),
+      typeTransfer: this.props.navigation.getParam('type_transfer'),
 
       PlaceOrigin: '',
       isEnabledPlaceOrigin: true,
@@ -54,14 +77,49 @@ export default class Change extends React.Component {
     this._loadCity().done();
   }
   
-  componentDidMount(){
+  async componentDidMount(){
+    if (this.state.typeTransfer === 'RECIBIR'){
+      try {
+        // Get data of user, if existe any.
+        const car = await AsyncStorage.getItem('car');
+        // If existe change to creen
+        if (car !== null) {
+          let car_json = JSON.parse(car);
+          this.setState({
+            isEnabledPlaceOrigin: false,
+            PlaceOrigin: car_json.Car.Transfer.PickupCityId.toString(),
+            OfficePlaceOrigin: car_json.Car.Transfer.PickupStationId.toString(),
+          });
+          axios.post(API.url, {
+            CityId: this.state.PlaceOrigin,
+            SessionId: this.state.SessionId,
+            Id: '0',
+            Action: "GetStationList"
+          })
+          .then((response) => {
+            // Get response, if response (Success) was true change to screen
+            if (response.data.result.Success && response.data.result.Success === true) {
+              this.setState({ StationsPlaceOrigin: response.data.result.BaseObjectList });
+            } else {
+              alert(response.data.result.ErrorDescription);
+            }
+          })
+          .catch((error) => {
+            // If exist error finished animation and show error
+            alert(error);
+          });
+        }
+      } catch (error) {
+        alert(error);
+      }
+    }
+    console.log(this.state.OfficePlaceOrigin);
   }
-
 
   _loadCity= async () =>{
     // Do request to api send params at form
     axios.post(API.url, {
-      SessionId: this.state.SessionId,
+      SessionId: "1799979",
       Id: '0',
       Action: "GetCityList"
     })
@@ -152,14 +210,11 @@ export default class Change extends React.Component {
   handleSubmit(){
     const  {
       PlaceOrigin, OfficePlaceOrigin,
-      PlaceDestination, OfficePlaceDestination, SessionId
+      PlaceDestination, OfficePlaceDestination, 
+      SessionId, typeTransfer
     } = this.state;
     this.setState({ isLoading: false, });
-    // console.log("Plaza origin es: " + PlaceOrigin, "y la oficina origin es: ", OfficePlaceOrigin);
-    // console.log("----------");
-    // console.log("Plaza destino es: " + PlaceDestination, "y la oficina destino es: ", OfficePlaceDestination);
-    
-    // Do request to api send params at form
+
     axios.post(API.url, {
       PickupCityId: PlaceOrigin,
       PickupStationId: OfficePlaceOrigin,
@@ -175,6 +230,7 @@ export default class Change extends React.Component {
         this.setState({ isLoading: true });
         this.props.navigation.navigate('Verify', {
           SessionId: SessionId,
+          type_transfer: typeTransfer,
         });
       } else {
         alert(response.data.result.ErrorDescription);
@@ -230,7 +286,7 @@ export default class Change extends React.Component {
         <View style={[common.flex_1, common.bg_white]}>
   
           <View style={[common.ml_10, common.mr_10]}>
-            <Text style={[common.text_center, common.h1, common.text_other_black, common.pt_10, common.pb_10, common.text_other_black]}>
+            <Text style={[common.h2, common.text_other_black, common.pt_10, common.pb_10, common.text_other_black]}>
               Seleccione oficina de origen
             </Text>
   
@@ -239,7 +295,7 @@ export default class Change extends React.Component {
                 enabled={isEnabledPlaceOrigin}
                 selectedValue={PlaceOrigin}
                 onValueChange={value => this.handleChangeSelectPlace("PlaceOrigin", value) }>
-                <Picker.Item label="Selecciona plaza origen" value="0"  color={Colors.other_black} key={0} />
+                <Picker.Item label="Selecciona plaza origen" value="0" color={Colors.other_black} key={0} />
                 {pickerItems}
               </Picker>
             </View>
@@ -248,16 +304,15 @@ export default class Change extends React.Component {
               <Picker
                 enabled={isEnabledOfficePlaceOrigin}
                 selectedValue={OfficePlaceOrigin}
-                onValueChange={(value) => this.setState({ OfficePlaceOrigin: value }) }>
-                <Picker.Item label="Selecciona oficina origen" value={0} color={Colors.other_black} key={0} />
+                onValueChange={value => this.setState({ OfficePlaceOrigin: value }) }>
+                <Picker.Item label="Selecciona oficina origen" value="0" color={Colors.other_black} key={0} /> 
                 {itemsStationOrigin}
               </Picker>
             </View>
             {/* First section select */}
   
             <Text style={[
-              common.text_center, 
-              common.h1, 
+              common.h2, 
               common.text_other_black, 
               common.pt_10, 
               common.pb_10,
@@ -345,5 +400,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
 });

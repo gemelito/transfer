@@ -4,10 +4,10 @@ import {
   View,
   Image,
   Vibration,
-  Dimensions 
+  Dimensions,
+  PixelRatio
 } from 'react-native';
 import { Camera, FileSystem, Permissions, ImagePicker } from 'expo';
-
 
 import BtnOpenGallery from '../components/buttons/camera/open-gallery';
 import BtnReverseCamera from '../components/buttons/camera/reverse-camera';
@@ -32,24 +32,28 @@ export default class CameraScreen extends React.Component {
     this.state = {
       hasCameraPermission: null,
       type: Camera.Constants.Type.back,
+
+      SessionId: this.props.navigation.getParam('SessionId'),
+      typeTransfer: this.props.navigation.getParam('type_transfer'),
       image: null,
-      photoId: 1
+      photoId: 1,
+      picture: ''
     };
   }
 
   async componentDidMount() {
-    try {
-      let folder = FileSystem.documentDirectory + "photo"
-      await FileSystem.makeDirectoryAsync(folder, {
-        intermediates: true
-      })
+    // try {
+    //   let folder = FileSystem.documentDirectory + "photo"
+    //   await FileSystem.makeDirectoryAsync(folder, {
+    //     intermediates: true
+    //   })
 
-      var fi = await FileSystem.getInfoAsync(folder);
+    //   var fi = await FileSystem.getInfoAsync(folder);
 
-      alert(JSON.stringify(fi))
-    } catch (error) {
-      console.log(error);
-    }
+    //   alert(JSON.stringify(fi))
+    // } catch (error) {
+    //   console.log(error);
+    // }
   }
 
   async componentWillMount() {
@@ -62,8 +66,8 @@ export default class CameraScreen extends React.Component {
     const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true
-      // aspect: [4, 3]
+      allowsEditing: true,
+      aspect: [4, 3]
     });
 
     if (!result.cancelled) {
@@ -77,12 +81,15 @@ export default class CameraScreen extends React.Component {
 
   takePicture = async () => {
     if (this.camera) {
-    let photo = await this.camera.takePictureAsync();
-    this.setState({
-      photoId: this.state.photoId + 1,
-      image: photo.uri
-    });
-    Vibration.vibrate();
+
+      const options = { quality: 1, base64: true, width: ex.width, height: ex.height};
+      let result = await this.camera.takePictureAsync(options);
+      this.setState({
+        photoId: this.state.photoId + 1,
+        image: result.uri,
+        picture: result.base64
+      });
+      Vibration.vibrate();
 
     // this.camera.takePictureAsync().then(data => {
     //   const image = `${FileSystem.documentDirectory}photo/Photo_${
@@ -108,15 +115,14 @@ export default class CameraScreen extends React.Component {
 
   render() {
     const { hasCameraPermission, image } = this.state;
-    console.log(ex.width);
-    
+
     if (hasCameraPermission === null) {
       return <View />;
     } else if (hasCameraPermission === false) {
       return <Text>No access to camera</Text>;
     } else {
       return (
-        <View style={[common.flex_1]}>
+        <View style={[{flex: 1}]}>
           { image ?
             <Image
               source={{ uri: image }}
@@ -126,7 +132,7 @@ export default class CameraScreen extends React.Component {
             <Camera style={[common.flex_1]} type={this.state.type} ref={ref => {this.camera = ref; }} >              
               <View style={[ common.flex_1, {alignItems: 'center',justifyContent: 'flex-end'}]}>
                 {/* Rirar la camara */}
-                <BtnReverseCamera
+                {/* <BtnReverseCamera
                   onPress={() => {
                     this.setState({
                       type:
@@ -136,7 +142,7 @@ export default class CameraScreen extends React.Component {
                     });
                   }}
                   style={[common.absolute, common.bottom_0, common.pb_10, { right: 10 }]}
-                />
+                /> */}
                 {/* Rirar la camara */}
 
                 {/* Tomar la foto */}
@@ -149,13 +155,13 @@ export default class CameraScreen extends React.Component {
             </Camera>
           }
           
-          { !image ?
+          { image &&
             // Abrir la galeria 
-            <View style={[common.absolute, common.bottom_0, common.ml_10, common.pb_10]}>
-              <BtnOpenGallery onPress={this.pickImage}/>
-            </View>
+            // <View style={[common.absolute, common.bottom_0, common.ml_10, common.pb_10]}>
+            //   <BtnOpenGallery onPress={this.pickImage}/>
+            // </View>
             // Abrir la galeria 
-            :
+            // :
 
             <View
               style={[
@@ -182,11 +188,12 @@ export default class CameraScreen extends React.Component {
               <BtnAddRemovePhoto
                 nameIcon="ios-add-circle"
                 onPress={() => {
-                  this.setState({
-                    photoId: 1,
-                    image: null
+                  this.props.navigation.replace('Verify', {
+                    SessionId: this.state.SessionId,
+                    type_transfer: this.state.typeTransfer,
+                    photo: this.state.image,
+                    picture: this.state.picture
                   });
-                  this.props.navigation.navigate('Search', { image: this.state.image });
                 }}
               />
             </View>

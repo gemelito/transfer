@@ -10,6 +10,9 @@ import {
   type, ListViewDataSource,
 } from 'react-native';
 import Expo, { Components, Permissions, BarCodeScanner } from 'expo'; // eslint-disable-line no-unused-vars
+import axios from 'axios';
+
+import API from '../constants/base_url';
 
 const styles = StyleSheet.create({
   container: {
@@ -29,35 +32,20 @@ const styles = StyleSheet.create({
   },
 });
 
-type ScannerData = {
-  type: string,
-  data: string,
-};
-
-type Props = {};
-
 export default class App extends React.Component {
-  props: Props;
 
-  state: {
-    data: Array<string>,
-    dataSource: ListViewDataSource,
-    hasCameraPermission: boolean | null,
-    scannerOn: boolean,
+  static navigationOptions = {
+    header: null
   };
 
-  constructor(props: Props) {
+  constructor(props) {
     super(props);
 
-    const ds = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2,
-    });
-
     this.state = {
-      data: [],
-      dataSource: ds.cloneWithRows([]),
+      search: '',
       hasCameraPermission: null,
       scannerOn: false,
+      SessionId: this.props.navigation.getParam('SessionId', 'NO-IU'),
     };
   }
 
@@ -66,31 +54,56 @@ export default class App extends React.Component {
       const { status } = await Permissions.askAsync(Permissions.CAMERA);
       this.setState({ hasCameraPermission: status === 'granted' });
     })();
+    console.log(this.state.SessionId);
   }
 
-  openScanner = () => {
-    if (this.state.hasCameraPermission) {
-      this.setState({ scannerOn: true });
-    } else {
-      Alert.alert('No access to camera');
+  handleScanner = (ScannerData) => {
+    if(ScannerData.data > 0){
+      this.setState({ search: ScannerData.data });
+      this.doRequest();
     }
   };
 
-  handleScanner = (scannerData: ScannerData) => {
-    this.setState(prev => {
-      const data = prev.data.concat(scannerData.data);
-
-      return {
-        data,
-        dataSource: prev.dataSource.cloneWithRows(data),
-        scannerOn: false,
-      };
+  doRequest = () => {
+    // Do request to api send params at form
+    axios.post(API.url, {
+      SessionId: this.state.SessionId,
+      Id: this.state.search.toUpperCase(),
+      Action: "GetCar"
+    })
+    .then((response) => {
+      // Get response, if response (Success) was true change to screen
+      if (response.data.result.Success && response.data.result.Success === true) {
+        this._storeData(response.data.result);
+      } else {
+        alert(response.data.result.ErrorDescription);
+      }
+    })
+    .catch((error) => {
+      // If exist error finished animation and show error
+      alert(error);
     });
-  };
+  }
+
+  _storeData = async (data) => {
+    let type_transfer = 'RECIBIR';
+    try {
+      await AsyncStorage.setItem('car', JSON.stringify(data));
+      if (data.Car.Transfer.ActionType === 'S'){
+        type_transfer = 'TRASLADO';
+      }
+      this.props.navigation.navigate('Car', {
+        type_transfer: type_transfer,
+        SessionId: this.state.SessionId,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   render() {
     let contents;
-    if (this.state.hasCameraPermission && this.state.scannerOn) {
+    if (this.state.hasCameraPermission) {
       contents = (
         <BarCodeScanner
           onBarCodeRead={this.handleScanner}
@@ -101,18 +114,13 @@ export default class App extends React.Component {
     } else {
       contents = (
         <View style={{ marginTop: 50 }}>
-          <Button title="Scan" onPress={this.openScanner} />
-          <ListView
-            dataSource={this.state.dataSource}
-            renderRow={rowData => <Text style={styles.listItem}>{rowData}</Text>}
-            renderSeparator={(sectionId, rowId) => <View key={rowId} style={styles.separator} />}
-            enableEmptySections
-          />
+          <Text>NO access camera</Text>
         </View>
       );
     }
 
     return (
+      
       <View style={styles.container}>
         {contents}
       </View>

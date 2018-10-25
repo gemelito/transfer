@@ -1,6 +1,7 @@
 import {
   StyleSheet
 } from 'react-native';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 import Colors from './colors';
 
@@ -67,6 +68,9 @@ const common = StyleSheet.create({
   flex_1: {
     flex: 1
   },
+  flex_2: {
+    flex: 2
+  },
   display_flex: {
     display: 'flex'
   },
@@ -80,26 +84,32 @@ const common = StyleSheet.create({
     justifyContent: 'space-between'
   },
   h1: {
-    fontSize: 25
+    fontSize: hp('5%')
   },
   h2: {
-    fontSize: 23
+    fontSize: hp('4%')
   },
   h3: {
-    fontSize: 20
+    fontSize: hp('3%')
   },
 
-  pl_10: {
+  pad_l_10: {
     paddingLeft: 10
   },
-  pt_10: {
-    paddingTop: 10,
-  },
-  pr_10: {
+  pad_r_10: {
     paddingRight: 10
   },
+  pl_10: {
+    paddingLeft: hp('5%')
+  },
+  pt_10: {
+    paddingTop: hp('2%'),
+  },
+  pr_10: {
+    paddingRight: hp('5%')
+  },
   pb_10: {
-    paddingBottom: 10,
+    paddingBottom: hp('2%'),
   },
   pb_20: {
     paddingBottom: 20
@@ -128,7 +138,7 @@ const common = StyleSheet.create({
 
   /** Aligns **/
   text_center: {
-    alignItems: 'center'
+    textAlign: 'center'
   },
   left: {
     alignItems: 'flex-start'
@@ -165,17 +175,27 @@ const common = StyleSheet.create({
   },
 
   w_25: {
-    width: '25%'
+    width: wp('25%')
+  },
+  w_35: {
+    width: wp('32%')
   },
   w_45: {
-    width: '45%'
+    width: wp('45%')
   },
   w_45_btn: {
-    width: '45%'
+    width: wp('45%')
+  },
+  w_75: {
+    width: wp('75%')
   },
   w_100: {
-    width: '100%'
+    width: wp('100%')
   },
+
+  h_image: {
+    height: hp('24%')
+  }
 
 });
 

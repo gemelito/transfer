@@ -10,6 +10,8 @@ import Car from './app/screens/car';
 import Change from './app/screens/change';
 import Verify from './app/screens/verify';
 import Camera from './app/screens/camera';
+import Scanner from './app/screens/scanner';
+import Finalize from './app/screens/finalize';
 
 
 // This header sign in user and side navbar menu
@@ -24,11 +26,13 @@ const AppHomeStack = createStackNavigator(
     Car: Car,
     Change: Change,
     Verify: Verify,
-    Camera: Camera
+    Camera: Camera,
+    Scanner: Scanner,
+    Finalize: Finalize
   },
   {
     // Initial Screen component
-    initialRouteName: 'Verify',
+    initialRouteName: 'Search',
     // Options setup navigation
     navigationOptions: ({ navigation }) => ({
       // Side navbar menu

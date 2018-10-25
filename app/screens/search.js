@@ -1,8 +1,6 @@
 import React from 'react';
 import {
-  StyleSheet,
   View,
-  Platform,
   KeyboardAvoidingView,
   TextInput,
   AsyncStorage,
@@ -10,6 +8,8 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
+
+import Buttons from '../components/buttons/button';
 
 import Colors from '../constants/colors';
 import common from '../constants/common';
@@ -79,9 +79,6 @@ export default class Search extends React.Component {
       // Get response, if response (Success) was true change to screen
       if (response.data.result.Success && response.data.result.Success === true) {
         this._storeData(response.data.result);
-        this.setState({
-          isLoading: false
-        });
       } else {
         alert(response.data.result.ErrorDescription);
         this.setState({
@@ -101,9 +98,10 @@ export default class Search extends React.Component {
   }
 
   _storeData = async (data) => {
-    let type_transfer = 'CAMBIO';
+    let type_transfer = 'RECIBIR';
     try {
       await AsyncStorage.setItem('car', JSON.stringify(data));
+      this.setState({ isLoading: false });
       if (data.Car.Transfer.ActionType === 'S'){
         type_transfer = 'TRASLADO';
       }
@@ -118,59 +116,69 @@ export default class Search extends React.Component {
 
 
   render() {
-    return (
-      <KeyboardAvoidingView style={styles.main_login}  behavior="padding" enabled>
-          
-        <View 
-          style={[
-            common.row, 
-            common.border, 
-            common.ml_10, 
-            common.mr_10, 
-            common.pl_10,
+    const { isLoading} = this.state;
+    if (!isLoading) {
+      return (
+        <KeyboardAvoidingView style={[common.bg_white, common.center, common.flex_1] }  behavior="padding" enabled>
+          <View style={[common.w_100, common.pl_10, common.pr_10]}>
 
-            this.state.errorLabel ? common.border_invalid : (this.state.isFocused) ? common.border_valid : common.border_black_dark
-          ]}
-        >
-          <TextInput
-            style={[
-              common.flex_1, 
-              common.pt_10, 
-              common.pb_10, 
-              common.fs_16
-            ]}
+            <Buttons
+              textLabel="ESCANEAR CÓDIGO"
+              bg={common.bg_yellow}
+              borderColor={common.border_yellow}
+              onPress={() =>{
+                this.props.navigation.navigate('Scanner', {
+                  SessionId: this.state.SessionId,
+                });
+              }}
+            />
 
-            onFocus={this.onFocusChange}
-            placeholder="Ingresa número económico"
-            underlineColorAndroid="transparent"
-            onChangeText={ this.handleChangeText }
-            value={this.state.search}
-          />
+            <View 
+              style={[
+                common.row, 
+                common.border, 
+                common.mt_10, 
+                common.pad_l_10,
+                
 
-          <Ionicons name="md-search" size={32} onPress={this.handleValidate.bind(this)} 
-            style={[
-              common.pt_10, common.pr_10,
-              this.state.errorLabel ? common.text_red : (this.state.isFocused) ? common.text_green : common.text_black_dark
-            ]}
-          />
+                this.state.errorLabel ? common.border_invalid : (this.state.isFocused) ? common.border_valid : common.border_black_dark
+              ]}
+            >
+              
+              <TextInput
+                style={[
+                  common.flex_1, 
+                  common.pt_10, 
+                  common.pb_10, 
+                  common.fs_16
+                ]}
 
-      </View>
+                onFocus={this.onFocusChange}
+                placeholder="Ingresa número económico"
+                underlineColorAndroid="transparent"
+                onChangeText={ this.handleChangeText }
+                value={this.state.search}
+              />
 
-        { this.state.isLoading &&
-          <ActivityIndicator size="large" color={Colors.black} />
-        }
+              <Ionicons name="md-search" size={32} onPress={this.handleValidate.bind(this)} 
+                style={[
+                  common.pt_10, common.pad_r_10,
+                  this.state.errorLabel ? common.text_red : (this.state.isFocused) ? common.text_green : common.text_black_dark
+                ]}
+              />
 
-      </KeyboardAvoidingView>
-    );
+          </View>
+          </View>
+
+        </KeyboardAvoidingView>
+      );
+    } else {
+      return (
+        <View style={[common.flex_2, common.center, common.bg_white]}>
+          <ActivityIndicator size={70} color="#037B00" />
+          {/* <StatusBar barStyle="default" /> */}
+        </View>
+      );
+    }
   }
 }
-
-const styles = StyleSheet.create({
-  main_login: {
-    flex: 2,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  
-});

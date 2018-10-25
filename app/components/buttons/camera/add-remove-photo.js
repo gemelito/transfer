@@ -9,7 +9,7 @@ export default class BtnTakePhoto extends React.Component {
   render() {
     const { nameIcon } = this.props;
     return (
-      <View style={[common.w_45_btn, common.mr_10, common.text_center]}>
+      <View style={[common.w_45_btn, common.mr_10, common.center]}>
         <TouchableOpacity {...this.props}>
           <Ionicons
             name={nameIcon}

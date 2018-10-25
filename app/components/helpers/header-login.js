@@ -3,9 +3,15 @@ import {
   StyleSheet, 
   View,
   Image,
-  ScrollView
+  ScrollView,
+  Dimensions
  } from 'react-native';
 import colors from '../../constants/colors';
+
+const ex = {
+  width: Dimensions.get('window').width,
+  height: Dimensions.get('window').height
+}
 
 
 export default class HeaderLogin extends React.Component {
@@ -15,9 +21,15 @@ export default class HeaderLogin extends React.Component {
         keyboardDismissMode='interactive'
       >
         <View style={styles.container}>
-          <Image
-            source={require('../../../assets/logo_2.png')}
-          ></Image>
+          { ex.width >= 768 && ex.height >= 1024 ?
+            <Image
+              source={require('../../../assets/logo_4.png')}
+            />
+            :
+            <Image
+              source={require('../../../assets/logo_2.png')}
+            />
+          }
         </View>
       </ScrollView>
     );

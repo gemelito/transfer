@@ -16,11 +16,11 @@ export default class InputIcon extends Component {
         <TouchableOpacity {...this.props}>
           {this.props.showPassword ?
             <Ionicons name="md-eye" size={30}
-              style={[common.pr_10, (isFocused) ? common.text_green : common.text_black_dark]}
+              style={[(isFocused) ? common.text_green : common.text_black_dark, {paddingRight:10}]}
             />
             :
             <Ionicons name="md-eye-off" size={30}
-              style={[common.pr_10, (isFocused) ? common.text_green : common.text_black_dark, (isFocused) ? common.text_green : common.text_black_dark]}
+              style={[{paddingRight:10}, (isFocused) ? common.text_green : common.text_black_dark, (isFocused) ? common.text_green : common.text_black_dark]}
             />
           }  
         </TouchableOpacity>
@@ -29,7 +29,7 @@ export default class InputIcon extends Component {
       return (
         <TouchableOpacity {...this.props}>
           <Ionicons name="md-search" size={30}
-            style={[common.pr_10, (isFocused) ? common.text_green : common.text_black_dark]}
+            style={[{paddingRight:10}, (isFocused) ? common.text_green : common.text_black_dark]}
           />
         </TouchableOpacity>
       );

@@ -33,30 +33,33 @@ export default class InputField extends Component {
   togglePassword = () => { this.setState({ isTrue: !this.state.isTrue }); }
 
   render() {
-    const { holderText, inputIcon, inputTop, isEmpty, typeIcon } = this.props;
+    const { holderText, inputIcon, inputTop, isEmpty, typeIcon, inputHeight } = this.props;
+    
     return (
       <View style={[
         common.border,
         common.pt_10, 
         common.pb_10, 
-        common.w_100,
-        
+        common.row,
+
         inputTop ? common.mt_10 : '',
-        inputIcon ? common.row : '',
+        // inputIcon ? common.row : '',
         
         this.state.isFocused ? common.border_valid : common.border_black_dark,
         isEmpty ? common.border_invalid : ''
       ]}>
         <TextInput
           style={[
-            common.pl_10,
-            common.pr_10,
+            // common.pl_10,
+            // common.pr_10,
             common.fs_16,
             common.text_black,
+            common.flex_1,
 
-            { height:30 },
+            inputHeight ? { height: inputHeight } : { height:30 },
 
-            inputIcon ? { flex: 1 } : ''
+            // inputIcon ? { flex: 1 } : ''
+            { paddingLeft: 10, paddingRight: 10}
           ]}
 
           underlineColorAndroid="transparent"
