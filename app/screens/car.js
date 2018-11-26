@@ -20,28 +20,11 @@ const width = (ex.width >= 768 && ex.height >= 1024) ? wp('80%') : wp('62%');
 
 export default class Car extends React.Component {
   
-  static navigationOptions = ({ navigation }) => {
-    return {
-      title: navigation.getParam('type_transfer', 'RECIBIR'),
-      headerBackTitle: null,
-      headerStyle: {
-        // backgroundColor: '#0D2143',
-        // position: 'absolute',
-        // height: 50,
-        // top: 0,
-        // left: 0,
-        // right: 0,
-      },
-      headerTitleStyle: {
-        alignSelf: 'center',
-        textAlign: 'center',
-        
-        width: width,
-        color: Colors.other_black
-      },
-      // headerTintColor: 'green',
-    };
-  };
+  // static navigationOptions = ({ navigation }) => {
+  //   return {
+  //     title: navigation.getParam('type_transfer', null)
+  //   }
+  // };
 
   constructor(props){
     super(props);

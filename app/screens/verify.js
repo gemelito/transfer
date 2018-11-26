@@ -9,7 +9,7 @@ import {
   Image,
   ImageBackground,
   TouchableOpacity,
-  Dimensions,
+  // Dimensions,
   Alert
 } from 'react-native';
 import axios from 'axios';
@@ -29,26 +29,7 @@ const CAR = require('../../assets/car.png');
 const EMPTY = require('../../assets/square-empty.png');
 const FILLED = require('../../assets/square-filled.png');
 
-const ex = {
-  width: Dimensions.get('window').width,
-  height: Dimensions.get('window').height
-}
-const width = (ex.width >= 768 && ex.height >= 1024) ? wp('80%') : wp('62%');
-
 export default class Verify extends React.Component {
-
-  static navigationOptions = ({ navigation }) => {
-    return {
-      title: navigation.getParam('type_transfer', 'A Nested Details Screen'),
-      headerBackTitle: null,
-      headerTitleStyle: {
-        alignSelf: 'center',
-        textAlign: 'center',
-        width: width,
-        color: Colors.other_black
-      },
-    };
-  };
 
   constructor(props){
     super(props);
@@ -271,7 +252,7 @@ export default class Verify extends React.Component {
                   </View>
                 </View>
                 {editfuel ?
-                  <View style={[common.border, common.border_black_dark,]}>
+                  <View style={[common.border, common.border_black_dark, common.mr_10]}>
                     <Picker
                       style={{height:42}}
                       selectedValue={fuel}
@@ -309,10 +290,10 @@ export default class Verify extends React.Component {
                       common.center,
                       common.absolute,
                       {
-                        bottom: '32%',
-                        left: '42%',
+                        bottom: hp('5%'),
+                        left: wp('36%'),
                         borderRadius: 50,
-                        padding: 2.5,
+                        padding: 2.3,
                         borderWidth: 3.5, borderColor: "white",
                       }]}
 
@@ -322,14 +303,15 @@ export default class Verify extends React.Component {
                       type_transfer: this.state.typeTransfer
                     })}
                   >
-                    <MaterialIcons name="camera-alt" size={40}
+                    <MaterialIcons name="camera-alt" size={hp('8%')}
                       style={[
-                        common.text_white, common.pt_10, common.pb_10,
+                        common.text_white,
                         {
                           borderRadius: 50,
                           paddingLeft: 12,
                           backgroundColor: 'background: rgba(0,0,0,0.5);',
                           paddingRight: 12,
+                          padding: 10
                         }]}
                     />
                   </TouchableOpacity>
@@ -344,10 +326,10 @@ export default class Verify extends React.Component {
                   style={[
                     common.center, 
                     common.absolute,
-                    { bottom: '32%', 
-                      left: '42%', 
+                    { bottom: hp('5%'), 
+                      left: wp('36%'), 
                       borderRadius: 50,
-                      padding: 2.5,
+                      padding: 2.3,
                       borderWidth: 3.5, borderColor: "white",
                     }]}
                 
@@ -357,14 +339,15 @@ export default class Verify extends React.Component {
                     type_transfer: this.state.typeTransfer
                   })}
                 >
-                  <MaterialIcons name="camera-alt" size={40} 
+                  <MaterialIcons name="camera-alt" size={hp('8%')} 
                     style={[
-                      common.text_white, common.pt_10,common.pb_10,
+                      common.text_white,
                       {
                         borderRadius: 50,
                         paddingLeft: 12,
                         backgroundColor: 'background: rgba(0,0,0,0.5);',
-                        paddingRight: 12, 
+                        paddingRight: 12,
+                        padding:10
                     }]}
                   />
                 </TouchableOpacity>

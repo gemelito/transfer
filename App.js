@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-// import { Button, View, Text, Image, TouchableOpacity } from 'react-native';
+import { Dimensions } from 'react-native';
 import { createStackNavigator, createDrawerNavigator, createSwitchNavigator } from 'react-navigation';
+
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 // This screens
 import AuthLoading from './app/screens/authloading';
@@ -13,11 +15,19 @@ import Camera from './app/screens/camera';
 import Scanner from './app/screens/scanner';
 import Finalize from './app/screens/finalize';
 
-
 // This header sign in user and side navbar menu
 import HeaderBar from './app/components/helpers/header-bar';
 import SideMenu from './app/components/helpers/side-menu';
 
+import colors from './app/constants/colors';
+
+const ex = {
+  width: Dimensions.get('window').width,
+  height: Dimensions.get('window').height
+}
+const width = (ex.width >= 768 && ex.height >= 1024) ? wp('80%') : wp('62%');
+const height = (ex.width >= 768 && ex.height >= 1024) ? hp('15%') : hp('10%');
+const fs = (ex.width >= 768 && ex.height >= 1024) ? hp('10%') : hp('5%');
 
 const AppHomeStack = createStackNavigator(
   {
@@ -34,10 +44,29 @@ const AppHomeStack = createStackNavigator(
     // Initial Screen component
     initialRouteName: 'Search',
     // Options setup navigation
-    navigationOptions: ({ navigation }) => ({
-      // Side navbar menu
-      headerLeft: <HeaderBar navigationProps={navigation} />
-    })
+    navigationOptions: ({ navigation }) => {
+      const { params } = navigation.state;
+      return{
+        tabBarLabel: 'Home!',
+        title: params !== undefined ? params.type_transfer : null,
+        headerBackTitle: null,
+        headerStyle: {
+          backgroundColor: colors.white,
+          height: height,
+        },
+        headerTitleStyle: {
+          alignSelf: 'center',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: hp('5%'),
+          width: width,
+          color: colors.other_black
+        },
+        headerTintColor: 'green',
+        // Side navbar menu
+        headerLeft: <HeaderBar navigationProps={navigation} />
+      }
+    }
   }
 );
 
@@ -46,7 +75,6 @@ const AppStack = createDrawerNavigator(
     Application: AppHomeStack,
   },
   {
-    // contentComponent: SideMenu
     contentComponent: ({ navigation }) => (
       <SideMenu navigation={navigation} />
     ),

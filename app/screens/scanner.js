@@ -1,16 +1,10 @@
 // @flow
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  ListView,
-  Alert,
-  type, ListViewDataSource,
-} from 'react-native';
-import Expo, { Components, Permissions, BarCodeScanner } from 'expo'; // eslint-disable-line no-unused-vars
+import { StyleSheet, Text, View, Alert, AsyncStorage } from "react-native";
+import Expo, { Permissions, BarCodeScanner } from 'expo'; // eslint-disable-line no-unused-vars
 import axios from 'axios';
+
+import ResetNavigation from '../components/resetNavigation';
 
 import API from '../constants/base_url';
 
@@ -46,6 +40,7 @@ export default class App extends React.Component {
       hasCameraPermission: null,
       scannerOn: false,
       SessionId: this.props.navigation.getParam('SessionId', 'NO-IU'),
+      count: 0
     };
   }
 
@@ -54,13 +49,17 @@ export default class App extends React.Component {
       const { status } = await Permissions.askAsync(Permissions.CAMERA);
       this.setState({ hasCameraPermission: status === 'granted' });
     })();
-    console.log(this.state.SessionId);
+    // console.log(this.state.SessionId);
   }
 
   handleScanner = (ScannerData) => {
-    if(ScannerData.data > 0){
+    if(this.state.count === 0 && ScannerData.data > 0){
+      this.setState({ count: 1});
+      console.log(ScannerData.data);
       this.setState({ search: ScannerData.data });
-      this.doRequest();
+      setTimeout( () => {
+        this.doRequest();
+      }, 250);
     }
   };
 
@@ -76,16 +75,31 @@ export default class App extends React.Component {
       if (response.data.result.Success && response.data.result.Success === true) {
         this._storeData(response.data.result);
       } else {
-        alert(response.data.result.ErrorDescription);
+        Alert.alert(
+          'Error',
+          `${response.data.result.ErrorDescription}`,
+          [
+            { text: 'Intentar una vez más', onPress: () => setTimeout(() => { this.setState({ count: 0 }) }, 250) },
+            { text: 'Cancelar', onPress: () => this.props.navigation.dispatch(ResetNavigation) },
+          ],
+          { cancelable: false }
+        );
       }
     })
     .catch((error) => {
       // If exist error finished animation and show error
-      alert(error);
+      Alert.alert(
+        'Error',
+        `${error}`,
+        [
+          { text: 'Cancelar', onPress: () => this.props.navigation.dispatch(ResetNavigation)  }
+        ]
+      )
     });
   }
 
   _storeData = async (data) => {
+    this.setState({ count: 0 });
     let type_transfer = 'RECIBIR';
     try {
       await AsyncStorage.setItem('car', JSON.stringify(data));
@@ -97,7 +111,14 @@ export default class App extends React.Component {
         SessionId: this.state.SessionId,
       });
     } catch (error) {
-      console.log(error);
+      Alert.alert(
+        'Error',
+        `${error}`,
+        [
+          { text: 'Intentar una vez más', onPress: () => setTimeout(() => { this.setState({ count: 0 }) }, 250) },
+          { text: 'Cancelar', onPress: () => this.props.navigation.dispatch(ResetNavigation) }
+        ]
+      )
     }
   }
 

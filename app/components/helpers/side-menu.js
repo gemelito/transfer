@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   View,
-  Button,
   Text,
   TouchableOpacity,
   Image,
@@ -10,8 +9,15 @@ import {
   Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { StackActions, NavigationActions } from 'react-navigation';
 
 import Colors from '../../constants/colors';
+
+const resetAction = StackActions.reset({
+  index: 0,
+  actions: [NavigationActions.navigate({ routeName: 'Search' })],
+});
+
 
 export default class SideMenu extends React.Component {
 
@@ -39,7 +45,7 @@ export default class SideMenu extends React.Component {
     } catch (error) {
       Alert.alert(
         'Error',
-        error,
+        `${error}`,
         [{ text: 'CANCELAR' }]
       );
     }
@@ -55,7 +61,7 @@ export default class SideMenu extends React.Component {
     } catch (error) {
       Alert.alert(
         'Error',
-        error,
+        `${error}`,
         [{ text: 'CANCELAR' }]
       );
     }
@@ -83,9 +89,8 @@ export default class SideMenu extends React.Component {
           style={styles.btn_liks}
           onPress = {
             () => {
-              this.props.navigation.navigate('Search');
+              this.props.navigation.dispatch(resetAction);
               this.props.navigation.closeDrawer();
-
             }
           }
         >

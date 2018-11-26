@@ -6,37 +6,18 @@ import {
   Text,
   AsyncStorage,
   ActivityIndicator,
-  Dimensions,
+  // Dimensions,
   Alert
 } from 'react-native';
 import axios from 'axios';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
 import Buttons from '../components/buttons/button';
 
 import Colors from '../constants/colors';
 import common from '../constants/common';
 import API from '../constants/base_url';
 
-const ex = {
-  width: Dimensions.get('window').width,
-  height: Dimensions.get('window').height
-}
-const width = (ex.width >= 768 && ex.height >= 1024) ? wp('80%') : wp('62%');
-
 export default class Change extends React.Component {
-
-  static navigationOptions = ({ navigation }) => {
-    return {
-      title: navigation.getParam('type_transfer', 'A Nested Details Screen'),
-      headerBackTitle: null,
-      headerTitleStyle: {
-        alignSelf: 'center',
-        textAlign: 'center',
-        width: width,
-        color: Colors.other_black
-      },
-    };
-  };
 
   constructor(props){
     super(props);
@@ -54,7 +35,7 @@ export default class Change extends React.Component {
       PlaceDestination: '',
       isEnabledPlaceDestination: true,
       OfficePlaceDestination: '',
-      isEnabledOfficePlaceDestination: false,
+      isEnabledOfficePlaceDestination: true,
 
       CityId: 0,
 
@@ -76,59 +57,75 @@ export default class Change extends React.Component {
   }
   
   async componentDidMount(){
-    if (this.state.typeTransfer === 'RECIBIR'){
-      try {
-        // Get data of user, if existe any.
-        const car = await AsyncStorage.getItem('car');
-        // If existe change to creen
-        if (car !== null) {
-          let car_json = JSON.parse(car);
+    try {
+      // Get data of user, if existe any.
+      const car = await AsyncStorage.getItem('car');
+      // If existe change to creen
+      if (car !== null) {
+        let car_json = JSON.parse(car);
+        if (this.state.typeTransfer === 'RECIBIR'){
+          this.setState({
+            isEnabledPlaceOrigin: false,
+            PlaceOrigin: car_json.Car.Transfer.PickupCityId.toString(),
+            OfficePlaceOrigin: car_json.Car.Transfer.PickupStationId.toString(),
+            PlaceDestination: car_json.Car.Transfer.DropOffCityId.toString(),
+            OfficePlaceDestination: car_json.Car.Transfer.DropOffStationId.toString(),
+          });
+          this._getStationsInReceive("PlaceOrigin", this.state.PlaceOrigin);
+          this._getStationsInReceive("PlaceDestination", this.state.PlaceDestination);
+        }else{
           this.setState({
             isEnabledPlaceOrigin: false,
             PlaceOrigin: car_json.Car.Transfer.PickupCityId.toString(),
             OfficePlaceOrigin: car_json.Car.Transfer.PickupStationId.toString(),
           });
-          axios.post(API.url, {
-            CityId: this.state.PlaceOrigin,
-            SessionId: this.state.SessionId,
-            Id: '0',
-            Action: "GetStationList"
-          })
-          .then((response) => {
-            // Get response, if response (Success) was true change to screen
-            if (response.data.result.Success && response.data.result.Success === true) {
-              this.setState({ StationsPlaceOrigin: response.data.result.BaseObjectList });
-            } else {
-              Alert.alert(
-                'Advertencia',
-                `${response.data.result.ErrorDescription}`,
-                [{ text: 'CANCELAR' }]
-              );
-            }
-          })
-          .catch((error) => {
-            // If exist error finished animation and show error
-            Alert.alert(
-              'Error',
-              `${error}`,
-              [{ text: 'CANCELAR' }]
-            );
-          });
+          this._getStationsInReceive("PlaceOrigin", this.state.PlaceOrigin);
         }
-      } catch (error) {
+      }
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        `${error}`,
+        [{ text: 'CANCELAR' }]
+      );
+    }
+
+  }
+
+  _getStationsInReceive(key,station_id){
+    axios.post(API.url, {
+      CityId: station_id,
+      SessionId: this.state.SessionId,
+      Id: '0',
+      Action: "GetStationList"
+    })
+    .then((response) => {
+      // Get response, if response (Success) was true change to screen
+      if (response.data.result.Success && response.data.result.Success === true) {
+        // this.setState({ StationsPlaceOrigin: response.data.result.BaseObjectList });
+        this.setState({ ["Stations" + key]: response.data.result.BaseObjectList });
+      } else {
         Alert.alert(
-          'Error',
-          `${error}`,
+          'Advertencia',
+          `${response.data.result.ErrorDescription}`,
           [{ text: 'CANCELAR' }]
         );
       }
-    }
+    })
+    .catch((error) => {
+      // If exist error finished animation and show error
+      Alert.alert(
+        'Error',
+        `${error}`,
+        [{ text: 'CANCELAR' }]
+      );
+    });
   }
 
   _loadCity= async () =>{
     // Do request to api send params at form
     axios.post(API.url, {
-      SessionId: "1799979",
+      SessionId: this.state.SessionId,
       Id: '0',
       Action: "GetCityList"
     })
@@ -223,6 +220,14 @@ export default class Change extends React.Component {
       return Alert.alert(
         'Advertencia',
         'Se deben llenar los campos faltantes',
+        [{ text: 'CANCELAR' }]
+      );
+    }
+    if (OfficePlaceOrigin === OfficePlaceDestination) {
+      this.setState({ isErrorOfficePlaceDestination: true });
+      return Alert.alert(
+        'Advertencia',
+        'Las oficinas no deben ser igual',
         [{ text: 'CANCELAR' }]
       );
     }
@@ -358,12 +363,12 @@ export default class Change extends React.Component {
                 { pickerItems }
               </Picker>
             </View>
-            <View style={[common.border, isErrorOfficePlaceDestination ? common.border_invalid : common.border_black_dark,]}>
+            <View style={[common.border, isErrorOfficePlaceDestination ? common.border_invalid : common.border_black_dark]}>
               <Picker
                 enabled={isEnabledOfficePlaceDestination}
                 selectedValue={OfficePlaceDestination}
-                onValueChange={ (value) => this.setState({ OfficePlaceDestination: value})}>
-                <Picker.Item label="Selecciona oficina destino" value={0} color={Colors.other_black} key={0}/>
+                onValueChange={value => this.setState({ OfficePlaceDestination: value})}>
+                <Picker.Item label="Selecciona oficina destino" value="0" color={Colors.other_black} key={0}/>
                 {itemsStationDestination}
               </Picker>
             </View>

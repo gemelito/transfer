@@ -40,8 +40,8 @@ export default class Search extends React.Component {
       const session = await AsyncStorage.getItem('user');
       // If existe change to creen
       if (session !== null) {
-        let json_user = JSON.parse(session);
-        this.state.SessionId = json_user["Session"]["SessionId"];
+        let user = JSON.parse(session);
+        this.state.SessionId = user.Session.SessionId;
       }
    } catch (error) {
      Alert.alert(
